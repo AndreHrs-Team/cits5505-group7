@@ -8,6 +8,6 @@ echo Activating virtual environment...
 call ..\application-env\Scripts\activate.bat
 
 echo Running Flask app...
-flask run
+python app.py
 
 pause
