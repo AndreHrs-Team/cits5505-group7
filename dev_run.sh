@@ -11,4 +11,4 @@ echo "Activating virtual environment..."
 source ../application-env/bin/activate
 
 echo "Running Flask app..."
-flask run
+python app.py
