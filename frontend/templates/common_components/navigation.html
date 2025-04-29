@@ -57,27 +57,38 @@
               ><a
                 class="dropdown-item"
                 href="{{ url_for('render_finance_page') }}"
-                >Budget</a
+                >Transaction</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_categories_page') }}"
+                >Categories</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_accounts_page') }}"
+                >Accounts</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_insight_page') }}"
+                >Insight</a
               ></li
             >
           </ul>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item">
           <a
-            class="nav-link dropdown-toggle text-white fw-semibold"
+            class="nav-link text-white fw-semibold"
             href="#"
-            data-bs-toggle="dropdown"
             ><i class="fa-solid fa-book me-3"></i>Education</a
           >
-          <ul class="dropdown-menu">
-            <li
-              ><a
-                class="dropdown-item"
-                href="#"
-                >Resources</a
-              ></li
-            >
-          </ul>
         </li>
 
         <!-- User section mobile only -->

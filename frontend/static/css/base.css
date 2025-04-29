@@ -19,7 +19,15 @@
   --bs-color-black: #000;
 }
 
+.nav-tab-content {
+  border: var(--bs-border-width) solid transparent;
+}
+
 .background-darker {
+  background-color: var(--bs-color-gray-100);
+}
+
+.bg-color-gray-200 {
   background-color: var(--bs-color-gray-200);
 }
 
