@@ -1,0 +1,151 @@
+<nav
+  class="navbar navbar-expand-lg bg-primary navbar-dark py-3 slight-shadow-bottom px-5">
+  <div class="container-fluid">
+    <!-- Left: Brand -->
+    <div class="navbar-brand d-flex flex-column p-0">
+      <span class="h4 m-0 fw-bold">STUDENT</span>
+      <span class="h4 m-0 fw-bold">ASSISTANT</span>
+    </div>
+
+    <!-- Hamburger button -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Center: Nav links -->
+    <div
+      class="collapse navbar-collapse ms-lg-5"
+      id="navbarNav">
+      <ul class="navbar-nav gap-3">
+        <li class="nav-item">
+          <a
+            class="nav-link text-white fw-semibold {{ 'navbar-active' if request.endpoint == 'render_index_page' }}"
+            href="{{ url_for('render_index_page') }}">
+            <i class="fa-solid fa-house me-3"></i> Home
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle text-white fw-semibold {{ 'navbar-active' if request.endpoint == 'render_fitness_page' }}"
+            href="{{ url_for('render_fitness_page') }}"
+            data-bs-toggle="dropdown">
+            <i class="fas fa-dumbbell me-3"></i>Fitness
+          </a>
+          <ul class="dropdown-menu">
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_fitness_page') }}"
+                >Routine</a
+              ></li
+            >
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle text-white fw-semibold {{ 'navbar-active' if request.endpoint == 'render_finance_page' }}"
+            href="{{ url_for('render_finance_page') }}"
+            data-bs-toggle="dropdown">
+            <i class="fa-solid fa-money-bill me-3"></i> Finance
+          </a>
+          <ul class="dropdown-menu">
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_page') }}"
+                >Transaction</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_categories_page') }}"
+                >Categories</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_accounts_page') }}"
+                >Accounts</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="{{ url_for('render_finance_insight_page') }}"
+                >Insight</a
+              ></li
+            >
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link text-white fw-semibold"
+            href="#"
+            ><i class="fa-solid fa-book me-3"></i>Education</a
+          >
+        </li>
+
+        <!-- User section mobile only -->
+        <li class="nav-item dropdown d-lg-none border-top mt-3 pt-3">
+          <a
+            class="nav-link dropdown-toggle text-white fw-semibold"
+            href="#"
+            data-bs-toggle="dropdown">
+            <i class="fa-solid fa-circle-user me-3"></i>User
+          </a>
+          <ul class="dropdown-menu">
+            <li
+              ><a
+                class="dropdown-item"
+                href="#"
+                >Profile</a
+              ></li
+            >
+            <li
+              ><a
+                class="dropdown-item"
+                href="#"
+                >Logout</a
+              ></li
+            >
+          </ul>
+        </li>
+      </ul>
+
+      <!-- User section desktop only -->
+      <div class="d-none d-lg-flex ms-auto align-items-center">
+        <i class="fa-solid fa-circle-user me-3 text-white"></i>
+        <div class="dropdown">
+          <a
+            class="dropdown-toggle text-white fw-semibold"
+            href="#"
+            data-bs-toggle="dropdown">
+            User
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li
+              ><button
+                class="dropdown-item"
+                type="button"
+                >Profile</button
+              ></li
+            >
+            <li
+              ><button
+                class="dropdown-item"
+                type="button"
+                >Logout</button
+              ></li
+            >
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
