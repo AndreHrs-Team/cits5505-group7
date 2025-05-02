@@ -5,28 +5,28 @@
       class="nav-link {{ 'active' if request.endpoint == 'finance.render_finance_page' }}"
       aria-current="page"
       href="{{ url_for('finance.render_finance_page') }}"
-      >Transactions</a
+      ><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a
     >
   </li>
   <li class="nav-item">
     <a
       class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_categories_page' }}"
       href="{{ url_for('finance.render_finance_categories_page') }}"
-      >Categories</a
+      ><i class="fa-solid fa-cubes-stacked"></i> Categories</a
     >
   </li>
   <li class="nav-item">
     <a
       class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_accounts_page' }}"
       href="{{ url_for('finance.render_finance_accounts_page') }}"
-      >Accounts</a
+      ><i class="fa-solid fa-credit-card"></i> Accounts</a
     >
   </li>
   <li class="nav-item">
     <a
       class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_insight_page' }}"
       href="{{ url_for('finance.render_finance_insight_page') }}"
-      >Insight</a
+      ><i class="fa-solid fa-money-bill-trend-up"></i> Insight</a
     >
   </li>
 </ul>
