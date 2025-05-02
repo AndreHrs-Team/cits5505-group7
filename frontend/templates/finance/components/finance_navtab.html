@@ -2,30 +2,30 @@
 <ul class="nav nav-tabs">
   <li class="nav-item">
     <a
-      class="nav-link {{ 'active' if request.endpoint == 'render_finance_page' }}"
+      class="nav-link {{ 'active' if request.endpoint == 'finance.render_finance_page' }}"
       aria-current="page"
-      href="{{ url_for('render_finance_page') }}"
+      href="{{ url_for('finance.render_finance_page') }}"
       >Transactions</a
     >
   </li>
   <li class="nav-item">
     <a
-      class="nav-link  {{ 'active' if request.endpoint == 'render_finance_categories_page' }}"
-      href="{{ url_for('render_finance_categories_page') }}"
+      class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_categories_page' }}"
+      href="{{ url_for('finance.render_finance_categories_page') }}"
       >Categories</a
     >
   </li>
   <li class="nav-item">
     <a
-      class="nav-link  {{ 'active' if request.endpoint == 'render_finance_accounts_page' }}"
-      href="{{ url_for('render_finance_accounts_page') }}"
+      class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_accounts_page' }}"
+      href="{{ url_for('finance.render_finance_accounts_page') }}"
       >Accounts</a
     >
   </li>
   <li class="nav-item">
     <a
-      class="nav-link  {{ 'active' if request.endpoint == 'render_finance_insight_page' }}"
-      href="{{ url_for('render_finance_insight_page') }}"
+      class="nav-link  {{ 'active' if request.endpoint == 'finance.render_finance_insight_page' }}"
+      href="{{ url_for('finance.render_finance_insight_page') }}"
       >Insight</a
     >
   </li>
