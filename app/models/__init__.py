@@ -8,8 +8,12 @@ from .progress import Progress
 from .achievement import Achievement, UserAchievement
 from .import_log import ImportLog
 from .shared_link import SharedLink
+from .finance.account import Account
+from .finance.category import Category
+from .finance.transaction import Transaction
 # Import the models that depend on other models last
 from .share_access_log import ShareAccessLog
+
 
 __all__ = [
     'User',
@@ -23,7 +27,10 @@ __all__ = [
     'UserAchievement',
     'ImportLog',
     'SharedLink',
-    'ShareAccessLog'
+    'ShareAccessLog',
+    'Account',
+    'Category',
+    'Transaction'
 ]
 
 # This file imports all models to make them available when importing from the models package
