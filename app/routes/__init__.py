@@ -3,6 +3,8 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
+
+
 api = Blueprint('api', __name__, url_prefix='/api')
 
 # Remove or comment out the line below to break the circular import
@@ -16,10 +18,14 @@ def create_app():
     app.config.from_object('config.Config')
 
     db.init_app(app)
-    migrate.init_app(app, db)  
+    migrate.init_app(app, db)
 
-    # register blueprints
-    from app.routes import api
-    app.register_blueprint(api)
+    from app.routes import main_bp, education_bp
+    app.register_blueprint(main_bp)
+    app.register_blueprint(education_bp)
 
     return app
+
+
+from app.models.education_event import EducationEvent
+from app.routes.education_routes import bp as education_bp
