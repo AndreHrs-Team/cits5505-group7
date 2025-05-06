@@ -1,130 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block content %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Assistant</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+<h1>Education Page</h1>
 
-        .navbar {
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+<div class="container mt-4">
+  <h2>Education</h2>
+  <p>Got your ics subscription file from CAS? Import it now</p>
+  <form action="{{ url_for('education.import_ics') }}" method="POST" enctype="multipart/form-data">
+    <input type="file" name="ics_file" hidden id="icsFileInput" onchange="this.form.submit()" />
+    <button class="btn btn-primary mb-4" type="button" onclick="document.getElementById('icsFileInput').click()">Import cas .ics</button>
+  </form>
 
-        .navbar-left {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .navbar-menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .navbar-menu a {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            position: relative;
-        }
-
-        .navbar-menu a::after {
-            content: "▼";
-            font-size: 10px;
-            margin-left: 5px;
-        }
-
-        .user-icon {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .content-box {
-            border: 1px solid #ccc;
-            padding: 30px;
-            border-radius: 35px;
-            background-color: white;
-            max-width: 1100px;
-            margin: auto;
-            display: flex;
-            /* Add flex layout to align left and right parts horizontally */
-            gap: 40px;
-            /* Add spacing between left and right parts */
-        }
-
-        .left-part {
-            flex: 2;
-            /* Left part takes 2 portions of the space */
-        }
-
-        .right-part {
-            flex: 1;
-            /* Right part takes 1 portion of the space */
-        }
-
-        @media (max-width: 768px) {
-            .content-box {
-                flex-direction: column;
-                /* On small screens, stack the parts vertically */
-            }
-
-            .left-part,
-            .right-part {
-                flex: none;
-                width: 100%;
-                /* Each part takes full width on small screens */
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="navbar">
-        <div class="navbar-left">
-            STUDENT <br> ASSISTANT
-        </div>
-        <div class="navbar-menu">
-            <a href="#">Home</a>
-            <a href="#">Finance</a>
-            <a href="#">Education</a>
-            <div class="user-icon">
-                <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User Icon" width="24" height="24">
-                <span>User</span>
-            </div>
-        </div>
+  <div class="row">
+    <!-- Schedule -->
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>This week Schedule</h5>
+        {% for day, events in schedule.items() %}
+          <p>{{ day }}</p>
+          <ul>
+            {% for event in events %}
+              <li>{{ event }}</li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </div>
     </div>
 
-    <div class="content">
-        <div class="content-box">
-            <div class="left-part">
-                <p>Fill in basic project specification...</p>
-            </div>
-            <div class="right-part">
-                <h4>Notes:</h4>
-                <ul>
-                    <li>REPORT such data ONLY into the 2X/3X/4X form</li>
-                    <li>If it exists or not in existing, new justification is needed...</li>
-                </ul>
-            </div>
-        </div>
+    <!-- Events -->
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Upcoming Events</h5>
+        {% for e in events %}
+          <p><strong>{{ e.title }}</strong><br>
+          {{ e.description }}<br>
+          {{ e.date }} at {{ e.time }}<br>
+          {{ e.notes }}</p>
+        {% endfor %}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">Add new event</button>
+      </div>
     </div>
+  </div>
+</div>
 
-</body>
+<!-- Modal for Adding Event -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('education.add_event') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add new event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label }} {{ form.title(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.date.label }} {{ form.date(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.time.label }} {{ form.time(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.notes.label }} {{ form.notes(class="form-control", rows=3) }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
-</html>
+{% endblock %}
