@@ -1,17 +1,11 @@
 :root {
-<<<<<<< HEAD
-  --sub-text: 0.75rem;
-  --small-text: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --sub-text--line-height: calc(1 / 0.75);
-=======
+
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
   --text-xs--line-height: calc(1 / 0.75);
->>>>>>> dc77408547da44c66bf0a20e5ea8c9345dd3a276
+
   --small-text--line-height: calc(1.25 / 0.875);
   --text-lg--line-height: calc(1.5 / 1.125);
   --color-red-500: #fb2c36;
@@ -46,8 +40,7 @@
 .slight-shadow-bottom {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-<<<<<<< HEAD
-=======
+<
 
 .text-xs {
   font-size: var(--text-xs);
@@ -62,4 +55,3 @@
 .text-red {
   color: var(--color-red-500);
 }
->>>>>>> dc77408547da44c66bf0a20e5ea8c9345dd3a276

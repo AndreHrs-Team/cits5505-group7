@@ -79,9 +79,7 @@ Desktop.ini
 coverage.xml
 *.cover
 .hypothesis/
-<<<<<<< HEAD
+
 /application-env
-=======
 /application-env
 /.env
->>>>>>> dc77408547da44c66bf0a20e5ea8c9345dd3a276
