@@ -111,5 +111,11 @@ def create_app(config_name=None):
                 db.session.add(admin)
                 db.session.commit()
                 app.logger.info("Admin user created successfully.")
+            
+            # Initialize achievements
+            from app.init.achievements import init_achievements
+            app.logger.info("Initializing achievements...")
+            init_achievements()
+            app.logger.info("Achievements initialized successfully.")
 
     return app

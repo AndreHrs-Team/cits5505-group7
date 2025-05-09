@@ -377,12 +377,9 @@ def json_response(data, status=200):
 @login_required
 def get_dashboard_data():
     """Get dashboard data for the current user."""
-    # Clear any flash messages if directly accessing dashboard (not coming from login page)
-    # This helps prevent "Login successful!" message appearing repeatedly
+    # Clear any flash messages when accessing dashboard
     if '_flashes' in session:
-        # Only keep flashes if we're redirecting directly from login page
-        if not request.referrer or 'login' not in request.referrer:
-            session.pop('_flashes', None)
+        session.pop('_flashes', None)
     
     user_id = current_user.id
     

@@ -13,6 +13,10 @@ from app.forms.share_forms import CreateShareLinkForm, ManageShareLinkForm
 from werkzeug.utils import secure_filename
 from app.utils.date_utils import get_current_time
 from app.services.data_service import get_user_data_in_range
+from app.models.finance.account import Account
+from app.models.finance.transaction import Transaction
+from app.models.finance.category import Category
+from app.models.education_event import EducationEvent
 
 # For PDF export
 try:
@@ -56,6 +60,7 @@ def create_share_link():
         password = data.get('password')
         personal_message = data.get('personal_message', '')
         theme = data.get('theme', 'default')
+        name = data.get('name', 'Unnamed Link')
         
         # Convert modules to string if it's a list
         if isinstance(modules, list):
@@ -69,6 +74,7 @@ def create_share_link():
         # Create share link
         shared_link = SharedLink.create_shared_link(
             user_id=current_user.id,
+            name=name,
             privacy_level=privacy_level,
             modules=modules,
             template_type=template_type,
@@ -199,13 +205,27 @@ def view_shared_content(share_token):
     )
     
     # Render appropriate template
+    modules = json.loads(share_link.modules) if share_link.modules else []
+    # Ensure finance/education are included if show_finance/show_education is True
+    if getattr(share_link, 'show_finance', False) and 'finance' not in modules:
+        modules.append('finance')
+    if getattr(share_link, 'show_education', False) and 'education' not in modules:
+        modules.append('education')
+    context = dict(
+        user=user,
+        share_link=share_link,
+        data=data,
+        title=f'Health Data Shared by {user.get_full_name()}',
+        modules=modules
+    )
+    if 'finance' in modules:
+        context['accounts'] = Account.query.filter_by(user_id=share_link.user_id).all()
+        context['transactions'] = Transaction.query.filter_by(user_id=share_link.user_id).all()
+        context['categories'] = Category.query.filter_by(user_id=share_link.user_id).all()
+    if 'education' in modules:
+        context['education_events'] = EducationEvent.query.filter_by(user_id=share_link.user_id).all()
     template = f'share/{share_link.template_type}.html'
-    
-    return render_template(template, 
-                         user=user,
-                         share_link=share_link,
-                         data=data,
-                         title=f'Health Data Shared by {user.get_full_name()}')
+    return render_template(template, **context)
 
 @bp.route('/password/<share_token>', methods=['POST'])
 def check_password(share_token):
@@ -569,7 +589,9 @@ def create_share():
                 'show_activity': form.show_activity.data,
                 'show_sleep': form.show_sleep.data,
                 'show_goals': form.show_goals.data,
-                'show_achievements': form.show_achievements.data
+                'show_achievements': form.show_achievements.data,
+                'show_finance': form.show_finance.data,
+                'show_education': form.show_education.data
             }
             
             # Create the share link
@@ -608,7 +630,12 @@ def manage():
     """Manage existing share links"""
     # Get user's share links
     share_links = SharedLink.query.filter_by(user_id=current_user.id).order_by(SharedLink.created_at.desc()).all()
-    
+    # 解析modules字段为列表
+    for link in share_links:
+        try:
+            link.modules_list = json.loads(link.modules) if link.modules else []
+        except Exception:
+            link.modules_list = []
     return render_template('share/manage.html', 
                          share_links=share_links, 
                          title='Manage Share Links')
@@ -632,6 +659,8 @@ def edit_share(share_id):
         form.show_sleep.data = share_link.show_sleep
         form.show_goals.data = share_link.show_goals
         form.show_achievements.data = share_link.show_achievements
+        form.show_finance.data = getattr(share_link, 'show_finance', False)
+        form.show_education.data = getattr(share_link, 'show_education', False)
     
     if form.validate_on_submit():
         try:
@@ -670,6 +699,8 @@ def edit_share(share_id):
                     share_link.show_sleep = form.show_sleep.data
                     share_link.show_goals = form.show_goals.data
                     share_link.show_achievements = form.show_achievements.data
+                    share_link.show_finance = form.show_finance.data
+                    share_link.show_education = form.show_education.data
                     
                     # Update password if needed
                     if form.password_protect.data:
@@ -710,6 +741,8 @@ def edit_share(share_id):
                             show_sleep = :show_sleep,
                             show_goals = :show_goals,
                             show_achievements = :show_achievements,
+                            show_finance = :show_finance,
+                            show_education = :show_education,
                             password_hash = :password_hash
                             WHERE id = :id""",
                             {
@@ -721,6 +754,8 @@ def edit_share(share_id):
                                 "show_sleep": form.show_sleep.data,
                                 "show_goals": form.show_goals.data,
                                 "show_achievements": form.show_achievements.data,
+                                "show_finance": form.show_finance.data,
+                                "show_education": form.show_education.data,
                                 "password_hash": share_link.password_hash,
                                 "id": share_id
                             }
