@@ -4,7 +4,6 @@
 <h1>Education Page</h1>
 
 <div class="container mt-4">
-  <h2>Education</h2>
   <p>Got your ics subscription file from CAS? Import it now</p>
   <form action="{{ url_for('education.import_ics') }}" method="POST" enctype="multipart/form-data">
     <input type="file" name="ics_file" hidden id="icsFileInput" onchange="this.form.submit()" />
@@ -74,5 +73,6 @@
     </form>
   </div>
 </div>
+
 
 {% endblock %}
