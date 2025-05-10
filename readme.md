@@ -1,136 +1,114 @@
-## CITS 5505 Agile Web Development (Group 7)
-This is a repository for group 7 assignments
+# HealthTrack - Health and Fitness Tracking Application
 
-### Group Members
-- Andre Harsono (24478126)
-- Anqi Huang (23824496)
-- Christina Fington (24260355)
-- Steven Li (24291799)
+A comprehensive health and fitness tracking application built with Flask, SQLite, and Bootstrap. Track your activities, monitor health metrics, set goals, and share achievements.
 
-For tickets and logs please check projects tab instead
+## Features
 
-## Running Instructions
-- [Running Steps (For Windows)](#running-using-provided-script-recommended)
-  - [Running Steps (For Windows)](#running-steps-for-windows)
-  - [Running Steps (For Mac and Linux)](#running-steps-for-mac-and-linux)
-- [Manual Installation (For Windows)](#manual-installation-for-windows)
-- [Manual Installation (For Mac and Linux)](#manual-installation-for-mac-and-linux)
+- **Dashboard**: Get a comprehensive overview of all your health metrics in one place
+- **Activity Tracking**: Monitor steps, distance, and calories burned
+- **Heart Rate Monitoring**: Track your heart rate patterns over time
+- **Sleep Analysis**: Visualize your sleep duration and quality
+- **Weight Management**: Keep track of your weight changes
+- **Goal Setting**: Set and track personalized health goals
+- **Achievements**: Earn achievements for reaching milestones
+- **Data Sharing**: Securely share your health data with healthcare providers or family
+- **Data Import**: Import health data from various sources
+- **Dark Mode**: Toggle between light and dark themes for comfortable viewing
 
-## Running using provided script (Recommended)
+## Technology Stack
 
-> **Recommended:** Use `run.bat` (For Windows) or `run.sh` (For Linux or Mac) to automatically set up and run the project.
+- Backend: Flask with SQLAlchemy
+- Database: SQLite
+- Frontend: Bootstrap, jQuery, AJAX
+- Data Visualization: Plotly.js
+- File Parsing: Pandas, xmltodict
 
-This script will:
-- Check if the virtual environment `application-env` exists.
-- Create the virtual environment if it does not exist.
-- Install the required Python dependencies.
-- Activate the virtual environment.
-- Start the backend server.
----
-### Running Steps (For Windows)
-1. Open Command Prompt (CMD) or PowerShell.
-2. Navigate to the project root directory.
-3. Execute:
-```bat
-./run.bat
-```
----
-### Running Steps (For Mac and Linux)
+## Setup Instructions
 
-1. Open Terminal.
-2. Navigate to the project root directory.
-3. Execute:
+### Prerequisites
 
+- Python 3.9 or higher
+- pip (Python package manager)
+- Git
+
+### Installation
+
+1. Clone the repository:
 ```bash
-./run.sh
+git clone https://github.com/yourusername/healthtrack.git
+cd healthtrack
 ```
 
-> If you encounter a "Permission Denied" error, grant execute permission with the following command then try step 3 again.
->```bash
->chmod +x run.sh
->```
----
-
-## Manual Installation (For Windows)
-
-If you prefer to manually install and run the project:
-
-1. Open Command Prompt (CMD) or PowerShell.
-2. Navigate to the project root directory.
-3. Create a Python virtual environment named `application-env`:
-
-```bat
-python -m venv application-env
-```
-
-4. Activate the virtual environment:
-
-```bat
-application-env\Scripts\activate
-```
-
-5. Install the required dependencies:
-
-```bat
-pip install -r requirements.txt
-```
-
-6. Navigate to the `backend` directory:
-
-```bat
-cd backend
-```
-
-7. Run the Flask server:
-
-```bat
-flask run
-```
-
----
-
-## Manual Installation (For Mac and Linux)
-
-If you prefer to manually install and run the project:
-
-1. Open Terminal.
-2. Navigate to the project root directory.
-3. Create a Python virtual environment named `application-env`:
-
+2. Create and activate a virtual environment:
 ```bash
-python3 -m venv application-env
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-4. Activate the virtual environment:
-
-```bash
-source application-env/bin/activate
-```
-
-5. Install the required dependencies:
-
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-6. Navigate to the `backend` directory:
-
+4. Create a `.env` file in the project root with the following variables (adjust as needed):
 ```bash
-cd backend
+FLASK_APP=run.py
+FLASK_ENV=development
+SECRET_KEY=your-secret-key
+MAIL_SERVER=smtp.example.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@example.com
+MAIL_PASSWORD=your-email-password
 ```
 
-7. Run the Flask server:
+5. Initialize the database:
+```bash
+python -m app.init_db
+```
 
+   Or, if you just want to create tables without dropping existing data:
+```bash
+python -m app.init_db --create-only
+```
+
+6. Run the application:
 ```bash
 flask run
 ```
 
----
+7. Open your browser and navigate to `http://127.0.0.1:5000`
 
-> **Note:** The executable permissions for `.sh` scripts (`install.sh`, `run.sh`, `dev_run.sh`) are already set in the repository. However, if you encounter any permission issues on your system, please use the following command to fix it:
->
-> ```bash
-> chmod +x *.sh
-> ```
->
-> This will ensure all the helper scripts are executable.
+8. Default admin account:
+   - Email: admin@example.com
+   - Password: admin@123
+
+## Project Structure
+
+- `app/`: Main application package
+  - `models/`: Database models
+  - `routes/`: Route blueprints
+  - `services/`: Business logic
+  - `templates/`: HTML templates
+  - `static/`: CSS, JavaScript, and images
+  - `utils/`: Helper functions
+
+## Database
+
+The application is configured to use SQLite by default, with the database file stored in the `instance` folder. When deployed to render.com or similar platforms, the database tables will be automatically created on startup if they don't exist.
+
+If you need to manually initialize or reset the database:
+- Use `python -m app.init_db` to completely reset the database (drops all existing tables)
+- Use `python -m app.init_db --create-only` to only create missing tables without losing data
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

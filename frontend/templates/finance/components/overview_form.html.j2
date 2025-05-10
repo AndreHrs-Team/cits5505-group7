@@ -1,0 +1,116 @@
+{% extends "finance/components/finance_navtab.html.j2" %}
+{% block finance_content
+    %}
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="card h-100 p-2">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        {% block card_title %}{% endblock %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% block input_form %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            {% block graph_view %}{% endblock %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            {% block listed_items %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
+{% block extra_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+{% endblock %}
+{% macro render_finance_chart(chart_id, title) %}
+    <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ title }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="chart-container"
+                 style="position: relative;
+                        min-height: 350px;
+                        width: 100%">
+                <canvas id="{{ chart_id }}"></canvas>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+{% macro render_finance_chart_js(chart_id, data,
+    chart_type='bar') %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('{{ chart_id }}').getContext('2d');
+            new Chart(ctx, {
+                type: '{{ chart_type }}',
+                data: {
+                    labels: {{ data.labels|tojson }},
+                    datasets: [
+                        {
+                            label: 'Sum',
+                            data: {{ data.sum|tojson }},
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Average',
+                            data: {{ data.avg|tojson }},
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Max',
+                            data: {{ data.max|tojson }},
+                            type: 'line',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Min',
+                            data: {{ data.min|tojson }},
+                            type: 'line',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '{{ data.x_label }}'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '{{ data.title }}'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endmacro %}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Education Page</h1>
+
+<div class="container mt-4">
+  <h2>Education</h2>
+  <p>Got your ics subscription file from CAS? Import it now</p>
+  <form action="{{ url_for('education.import_ics') }}" method="POST" enctype="multipart/form-data">
+    <input type="file" name="ics_file" hidden id="icsFileInput" onchange="this.form.submit()" />
+    <button class="btn btn-primary mb-4" type="button" onclick="document.getElementById('icsFileInput').click()">Import cas .ics</button>
+  </form>
+
+  <div class="row">
+    <!-- Schedule -->
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>This week Schedule</h5>
+        {% for day, events in schedule.items() %}
+          <p>{{ day }}</p>
+          <ul>
+            {% for event in events %}
+              <li>{{ event }}</li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Upcoming Events</h5>
+        {% for e in events %}
+          <p><strong>{{ e.title }}</strong><br>
+          {{ e.description }}<br>
+          {{ e.date }} at {{ e.time }}<br>
+          {{ e.notes }}</p>
+        {% endfor %}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">Add new event</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Adding Event -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('education.add_event') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add new event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label }} {{ form.title(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.date.label }} {{ form.date(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.time.label }} {{ form.time(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.notes.label }} {{ form.notes(class="form-control", rows=3) }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
