@@ -24,7 +24,7 @@ class SharedLink(db.Model):
     last_accessed = db.Column(db.DateTime, nullable=True)
     access_count = db.Column(db.Integer, default=0)
     
-    # 添加兼容旧版UI的隐式属性
+    
     show_weight = db.Column(db.Boolean, default=True)
     show_heart_rate = db.Column(db.Boolean, default=True)
     show_activity = db.Column(db.Boolean, default=True)
@@ -35,6 +35,9 @@ class SharedLink(db.Model):
     # 一次性密码相关
     one_time_password = db.Column(db.Boolean, default=False)
     password_used = db.Column(db.Boolean, default=False)
+    
+    show_finance = db.Column(db.Boolean, default=False)
+    show_education = db.Column(db.Boolean, default=False)
     
     # Define relationship with User
     user = db.relationship('User', backref=db.backref('shared_links', lazy='dynamic'))
@@ -207,6 +210,7 @@ class SharedLink(db.Model):
             'id': self.id,
             'user_id': self.user_id,
             'share_token': self.share_token,
+            'name': self.name,
             'expires_at': self.expires_at.isoformat() if self.expires_at else None,
             'has_password': bool(self.password_hash),
             'privacy_level': self.privacy_level,
