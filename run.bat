@@ -1,8 +1,8 @@
 @echo off
 call install.bat
 
-echo Moving into backend folder...
-cd backend
+@REM echo Moving into backend folder...
+@REM cd backend
 
 echo Activating virtual environment...
 call ..\application-env\Scripts\activate.bat

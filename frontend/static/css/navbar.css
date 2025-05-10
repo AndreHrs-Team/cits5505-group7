@@ -1,0 +1,42 @@
+.navbar-active {
+  border-bottom: 2px solid white;
+  font-weight: bolder !important;
+}
+
+.navbar-brand .fa-parachute-box {
+  font-size: 2.4rem;
+  color: #3db6c6;
+  filter: drop-shadow(0 2px 6px #e6f7fa);
+  margin-right: 12px;
+}
+
+.navbar-brand.d-flex.flex-column.p-0 span {
+  color: #3db6c6;
+  font-family: 'Montserrat', 'Poppins', 'Roboto', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 8px #e6f7fa;
+  line-height: 1.1;
+}
+
+.navbar-brand.d-flex.flex-column.p-0 span:first-child {
+  font-size: 1.5rem;
+}
+
+.navbar-brand.d-flex.flex-column.p-0 span:last-child {
+  font-size: 1.5rem;
+}
+
+.navbar-brand.d-flex.flex-column.p-0 {
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .navbar-brand .fa-parachute-box {
+    font-size: 1.4rem;
+    margin-right: 6px;
+  }
+  .navbar-brand.d-flex.flex-column.p-0 span {
+    font-size: 1rem;
+  }
+}
