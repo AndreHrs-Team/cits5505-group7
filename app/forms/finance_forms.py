@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, StringField, SelectField, FloatField, TextAreaField, DateTimeField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Optional, NumberRange
+from wtforms.validators import DataRequired, Length, Optional, NumberRange, InputRequired
 from datetime import datetime
 
 
@@ -56,7 +56,7 @@ class TransactionForm(FlaskForm):
     category_id = SelectField('Category', coerce=int,
                               validators=[DataRequired()])
     amount = FloatField('Amount', default=0, validators=[
-        DataRequired(),
+        InputRequired(),
         NumberRange(min=0.00, message='Amount must not be negative'),
     ])
     date = DateTimeField('Date', format='%Y-%m-%dT%H:%M',  # Changed format
