@@ -5,7 +5,7 @@ from datetime import datetime
 
 class Transaction(db.Model):
     """Model for financial transactions."""
-     __tablename__ = 'finance_transactions'
+    __tablename__ = 'finance_transactions'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20), nullable=False)  # EXPENSE or INCOME

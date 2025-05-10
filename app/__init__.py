@@ -1,4 +1,3 @@
-from datetime import timedelta
 from app.config import config as config_mapping
 from flask_mail import Mail
 from flask_caching import Cache
@@ -88,13 +87,17 @@ def create_app(config_name=None):
     from app.cli import register_commands
     register_commands(app)
 
+    ### ===== AUTO CREATE LINE DISABLED =====
+    ### We are required to create database migration so I will disable this part in submission
+    ### Currently leaving it active for ease of development
+
     # Auto-create database tables if they don't exist (for SQLite on render)
     if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
         with app.app_context():
             from app.models import User
             app.logger.info("Creating database tables if they don't exist...")
 
-            # Auto create database
+            ## Auto create database
             db.create_all()
             app.logger.info("Database tables created successfully.")
 
@@ -114,7 +117,7 @@ def create_app(config_name=None):
                 db.session.commit()
                 app.logger.info("Admin user created successfully.")
 
-            # Initialize achievements
+            ## Initialize achievements
             from app.init.achievements import init_achievements
             app.logger.info("Initializing achievements...")
             init_achievements()

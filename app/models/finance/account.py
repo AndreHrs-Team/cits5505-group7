@@ -12,7 +12,7 @@ class Account(db.Model):
     type = db.Column(db.String(50))  # bank, wallet, etc.
     note = db.Column(db.Text)
     balance = db.Column(db.Float, default=0.0)
-    currency = db.Column(db.String(3), default='USD')
+    currency = db.Column(db.String(3), default='AUD')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -31,7 +31,7 @@ class Account(db.Model):
             'type': self.type,
             'note': self.note,
             'balance': self.balance,
-            'currency': self.currency
+            'currency': self.currency,
             'created_at': int(self.created_at.timestamp()),
             'updated_at': int(self.updated_at.timestamp()),
             'deleted_at': int(self.updated_at.timestamp())

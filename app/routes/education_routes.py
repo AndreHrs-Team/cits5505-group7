@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
 
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import flash, Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from app import db
@@ -18,13 +18,16 @@ def add_event():
         event = EducationEvent(
             user_id=current_user.id,
             title=form.title.data,
-            description=None,
+            description='',
             date=form.date.data,
             time=form.time.data,
             notes=form.notes.data
         )
         db.session.add(event)
         db.session.commit()
+        flash("Event added successfully.", "success")
+    else:
+        flash("Failed to add event.", "danger")
     return redirect(url_for('education.render_education_page'))
 
 
@@ -76,38 +79,3 @@ def render_education_page():
         events=all_events,
         schedule=schedule
     )
-
-@bp.route('/import', methods=['POST'])
-@login_required
-def import_ics():
-    ics_file = request.files.get('ics_file')
-    if ics_file and ics_file.filename.endswith('.ics'):
-        file_path = os.path.join('uploads', f"{current_user.id}_{ics_file.filename}")
-        os.makedirs('uploads', exist_ok=True)
-        ics_file.save(file_path)
-
-
-        print(f".ics file saved to: {file_path}")
-
-    return redirect(url_for('education.render_education_page'))
-
-
-@bp.route('/add', methods=['POST'])
-@login_required
-def add_event():
-    form = AddEventForm()
-    if form.validate_on_submit():
-        event = EducationEvent(
-            user_id=current_user.id,
-            title=form.title.data,
-            description='',
-            date=form.date.data,
-            time=form.time.data,
-            notes=form.notes.data
-        )
-        db.session.add(event)
-        db.session.commit()
-        flash("Event added successfully.", "success")
-    else:
-        flash("Failed to add event.", "danger")
-    return redirect(url_for('education.render_education_page'))
