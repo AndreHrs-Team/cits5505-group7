@@ -93,12 +93,14 @@ def create_app(config_name=None):
         with app.app_context():
             from app.models import User
             app.logger.info("Creating database tables if they don't exist...")
+
             # Auto create database
             db.create_all()
             app.logger.info("Database tables created successfully.")
 
             ## Create admin user if not exists
             ## Breaking if using migration without having any tables
+
             admin = User.query.filter_by(username='admin').first()
             if not admin:
                 app.logger.info("Creating admin user...")
@@ -111,7 +113,7 @@ def create_app(config_name=None):
                 db.session.add(admin)
                 db.session.commit()
                 app.logger.info("Admin user created successfully.")
-            
+
             # Initialize achievements
             from app.init.achievements import init_achievements
             app.logger.info("Initializing achievements...")
