@@ -29,7 +29,7 @@ def render_finance_page():
 def create_adjustment_transaction():
     data = request.get_json()
     success, result = AccountController.handle_balance_adjustment(current_user, data)
-    
+
     if success:
         return jsonify({'success': True}), 200
     else:

@@ -85,7 +85,26 @@ def view(achievement_id):
 @admin_required
 def admin_index():
     """Admin interface for managing achievements"""
-    achievements = Achievement.query.order_by(Achievement.category, Achievement.level).all()
+    achievements = Achievement.query.all()
+    
+    # Set and save default icons based on category if icon is missing
+    for achievement in achievements:
+        if not achievement.icon:
+            if achievement.category == 'steps':
+                achievement.icon = 'walking'
+            elif achievement.category == 'weight':
+                achievement.icon = 'weight'
+            elif achievement.category == 'sleep':
+                achievement.icon = 'bed'
+            elif achievement.category == 'heart_rate':
+                achievement.icon = 'heartbeat'
+            else:
+                achievement.icon = 'medal'
+            db.session.add(achievement)  # Mark for update
+    
+    if db.session.dirty:  # If any changes were made
+        db.session.commit()  # Save changes to database
+    
     return render_template('achievements/admin/index.html', achievements=achievements)
 
 @bp.route('/admin/create', methods=['GET', 'POST'])

@@ -1,9 +1,11 @@
 from datetime import datetime
 from app import db
+from datetime import datetime
 
 
 class Transaction(db.Model):
-    __tablename__ = 'finance_transactions'
+    """Model for financial transactions."""
+     __tablename__ = 'finance_transactions'
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20), nullable=False)  # EXPENSE or INCOME
@@ -42,3 +44,6 @@ class Transaction(db.Model):
             'created_at': int(self.created_at.timestamp()),
             'updated_at': int(self.updated_at.timestamp())
         }
+
+    def __repr__(self):
+        return f'<Transaction {self.id}: {self.amount}>'
