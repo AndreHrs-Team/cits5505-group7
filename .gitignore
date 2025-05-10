@@ -19,12 +19,15 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+**/__pycache__
 
 # Virtual Environment
 venv/
 ENV/
 env/
 .env
+/application-env
+/.env
 
 # IDE
 .idea/
@@ -79,5 +82,3 @@ Desktop.ini
 coverage.xml
 *.cover
 .hypothesis/
-/application-env
-/.env

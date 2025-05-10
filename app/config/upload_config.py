@@ -14,7 +14,7 @@ def init_upload_config(app):
     
     # Upload configuration
     app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER') or os.path.join(instance_path, 'uploads')
-    app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  # Default 16MB
+    app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  
     app.config['ALLOWED_EXTENSIONS'] = {'zip', 'xml', 'csv'}
     
     # Ensure upload directory exists
