@@ -31,7 +31,7 @@ class Account(db.Model):
             'type': self.type,
             'note': self.note,
             'balance': self.balance,
-            'currency': self.currency
+            'currency': self.currency,
             'created_at': int(self.created_at.timestamp()),
             'updated_at': int(self.updated_at.timestamp()),
             'deleted_at': int(self.updated_at.timestamp())

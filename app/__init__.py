@@ -1,4 +1,3 @@
-from datetime import timedelta
 from app.config import config as config_mapping
 from flask_mail import Mail
 from flask_caching import Cache
@@ -49,6 +48,8 @@ def create_app(config_name=None):
     # User loader
     from app.models import User
 
+    import app.models
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -95,24 +96,24 @@ def create_app(config_name=None):
             app.logger.info("Creating database tables if they don't exist...")
 
             # Auto create database
-            db.create_all()
+            # db.create_all()
             app.logger.info("Database tables created successfully.")
 
             ## Create admin user if not exists
             ## Breaking if using migration without having any tables
 
-            admin = User.query.filter_by(username='admin').first()
-            if not admin:
-                app.logger.info("Creating admin user...")
-                admin = User(
-                    username='admin',
-                    email='admin@example.com',
-                    is_admin=True
-                )
-                admin.set_password('admin@123')
-                db.session.add(admin)
-                db.session.commit()
-                app.logger.info("Admin user created successfully.")
+            # admin = User.query.filter_by(username='admin').first()
+            # if not admin:
+            #     app.logger.info("Creating admin user...")
+            #     admin = User(
+            #         username='admin',
+            #         email='admin@example.com',
+            #         is_admin=True
+            #     )
+            #     admin.set_password('admin@123')
+            #     db.session.add(admin)
+            #     db.session.commit()
+            #     app.logger.info("Admin user created successfully.")
 
             # Initialize achievements
             from app.init.achievements import init_achievements

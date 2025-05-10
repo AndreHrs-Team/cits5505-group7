@@ -28,6 +28,7 @@ env/
 .env
 /application-env
 /.env
+/venv311
 
 # IDE
 .idea/

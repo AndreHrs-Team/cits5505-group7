@@ -5,7 +5,7 @@ call install.bat
 @REM cd backend
 
 echo Activating virtual environment...
-call ..\application-env\Scripts\activate.bat
+call .\application-env\Scripts\activate
 
 echo Running Flask app...
 flask run
