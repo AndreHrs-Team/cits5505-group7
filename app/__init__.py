@@ -87,40 +87,42 @@ def create_app(config_name=None):
     from app.cli import register_commands
     register_commands(app)
 
-    ### ===== AUTO CREATE LINE DISABLED =====
-    ### We are required to create database migration so I will disable this part in submission
-    ### Currently leaving it active for ease of development
+    auto_create_db = os.environ.get('USE_AUTO_GENERATION', 'False').lower() == 'true'
+    if(auto_create_db):
+        # Auto-create database tables if they don't exist (for SQLite on render)
+        if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
+            with app.app_context():
+                from app.models import User
+                app.logger.info("Creating database tables if they don't exist...")
 
-    # Auto-create database tables if they don't exist (for SQLite on render)
-    if 'sqlite' in app.config['SQLALCHEMY_DATABASE_URI']:
-        with app.app_context():
-            from app.models import User
-            app.logger.info("Creating database tables if they don't exist...")
+                ## Auto create database
+                db.create_all()
+                app.logger.info("Database tables created successfully.")
 
-            ## Auto create database
-            db.create_all()
-            app.logger.info("Database tables created successfully.")
+                ## Create admin user if not exists
+                ## Breaking if using migration without having any tables
 
-            ## Create admin user if not exists
-            ## Breaking if using migration without having any tables
+                admin = User.query.filter_by(username='admin').first()
+                if not admin:
+                    app.logger.info("Creating admin user...")
+                    admin = User(
+                        username='admin',
+                        email='admin@example.com',
+                        is_admin=True
+                    )
+                    admin.set_password('admin@123')
+                    db.session.add(admin)
+                    db.session.commit()
+                    app.logger.info("Admin user created successfully.")
 
-            admin = User.query.filter_by(username='admin').first()
-            if not admin:
-                app.logger.info("Creating admin user...")
-                admin = User(
-                    username='admin',
-                    email='admin@example.com',
-                    is_admin=True
-                )
-                admin.set_password('admin@123')
-                db.session.add(admin)
-                db.session.commit()
-                app.logger.info("Admin user created successfully.")
-
-            ## Initialize achievements
-            from app.init.achievements import init_achievements
-            app.logger.info("Initializing achievements...")
-            init_achievements()
-            app.logger.info("Achievements initialized successfully.")
-
+                ## Initialize achievements
+                from app.init.achievements import init_achievements
+                app.logger.info("Initializing achievements...")
+                init_achievements()
+                app.logger.info("Achievements initialized successfully.")
+        else:
+            print('Database is not that of sqlite type')
+    else:
+        print('Database Auto creation skipped')
+    
     return app
