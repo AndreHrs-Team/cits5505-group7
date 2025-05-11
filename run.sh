@@ -1,14 +1,16 @@
 #!/bin/bash
-set -e  # Exit immediately if any command fails
 
-# Run install.sh first
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+echo "[Run] Running install.sh..."
 ./install.sh
 
-echo "Moving into backend folder..."
-cd backend
+echo "[Run] Running db_migration.sh..."
+./db_migration.sh
 
-echo "Activating virtual environment..."
-source ../application-env/bin/activate
+echo "[Run] Activating virtual environment..."
+source application-env/bin/activate
 
-echo "Running Flask app..."
+echo "[Run] Running Flask app..."
 flask run
