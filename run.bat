@@ -1,13 +1,12 @@
 @echo off
 call install.bat
 
-@REM echo Moving into backend folder...
-@REM cd backend
+call db_migration.bat
 
-echo Activating virtual environment...
+echo [Run] Activating virtual environment...
 call .\application-env\Scripts\activate
 
-echo Running Flask app...
+echo [Run] Running Flask app...
 flask run
 
 pause

@@ -1,19 +1,18 @@
 #!/bin/bash
-set -e  # Exit immediately if any command fails
 
-echo "Checking if virtual environment exists..."
-if [ ! -f "./application-env/bin/activate" ]; then
-    echo "Virtual environment not found..."
-    echo "Creating virtual environment..."
+echo "[Install] Checking if virtual environment exists..."
+
+if [ ! -f "application-env/bin/activate" ]; then
+    echo "[Install] Virtual environment not found..."
+    echo "[Install] Creating virtual environment..."
     python3 -m venv application-env
 
-    echo "Activating virtual environment..."
+    echo "[Install] Activating virtual environment..."
     source application-env/bin/activate
 
-    echo "Installing dependencies..."
+    echo "[Install] Installing dependencies..."
     pip install -r requirements.txt
 else
-    echo "Virtual environment found..."
-    # Activate it (optional here if you just want to acknowledge)
+    echo "[Install] Virtual environment found..."
     source application-env/bin/activate
 fi
