@@ -44,6 +44,8 @@ class CreateShareLinkForm(FlaskForm):
     show_sleep = BooleanField('Include Sleep Data', default=True)
     show_goals = BooleanField('Include Goals', default=True)
     show_achievements = BooleanField('Include Achievements', default=True)
+    show_finance = BooleanField('Include Finance Data', default=False)
+    show_education = BooleanField('Include Education Data', default=False)
     
     submit = SubmitField('Create Share Link')
     
@@ -92,6 +94,8 @@ class ManageShareLinkForm(FlaskForm):
     show_sleep = BooleanField('Include Sleep Data')
     show_goals = BooleanField('Include Goals')
     show_achievements = BooleanField('Include Achievements')
+    show_finance = BooleanField('Include Finance Data')
+    show_education = BooleanField('Include Education Data')
     
     submit = SubmitField('Update Share Link')
     delete = SubmitField('Delete Share Link')

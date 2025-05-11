@@ -24,7 +24,7 @@ class TransactionService:
                 title=form.title.data,
                 note=form.note.data
             )
-            
+
             db.session.add(transaction)
             db.session.commit()
             return True, account.balance
@@ -36,7 +36,7 @@ class TransactionService:
     def get_transaction_stats(user_id, days=28):
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
-        
+
         return db.session.query(
             Transaction.type,
             func.sum(Transaction.amount).label('sum'),
@@ -47,7 +47,7 @@ class TransactionService:
             Transaction.user_id == user_id,
             Transaction.date.between(start_date, end_date)
         ).group_by(Transaction.type).all()
-    
+
 
     @staticmethod
     def get_user_transactions(user_id):
@@ -61,7 +61,7 @@ class TransactionService:
             transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
             if not transaction:
                 return False, "Transaction not found"
-            
+
             previous_amount = transaction.amount
             if form.type.data == 'EXPENSE':
                 account.balance += previous_amount
@@ -82,7 +82,7 @@ class TransactionService:
             transaction.date = form.date.data
             transaction.title = form.title.data
             transaction.note = form.note.data
-            
+
             db.session.commit()
             return True, None
         except Exception as e:
@@ -93,7 +93,7 @@ class TransactionService:
     def delete_transaction(transaction_id, user_id):
         try:
             transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
-            
+
             if not transaction:
                 return False, "Transaction not found"
             
@@ -104,7 +104,7 @@ class TransactionService:
                 account.balance += previous_amount
             else:
                 account.balance -= previous_amount
-            
+
             db.session.delete(transaction)
             db.session.commit()
             return True, None

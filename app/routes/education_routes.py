@@ -1,17 +1,58 @@
-import os
-from datetime import datetime, timedelta
-from collections import defaultdict
-
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template
 from flask_login import login_required, current_user
-from icalendar import Calendar
-
 from app import db
-from app.models.education_event import EducationEvent
-from app.forms.education_forms import AddEventForm
+from app.utils.decorators import admin_required
+from app.utils.cache_utils import invalidate_dashboard_cache
 
 bp = Blueprint('education', __name__, url_prefix='/education')
 
+
+@bp.route('/')
+@login_required
+def render_education_page():
+    return render_template('education/education.html', title="education")
+
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask_login import login_required, current_user
+from app.forms.education_forms import AddEventForm
+from app.models.education_event import EducationEvent
+from app import db
+from datetime import datetime, timedelta
+import os
+
+bp = Blueprint('education', __name__, url_prefix='/education')
+
+@bp.route('/add', methods=['POST'])
+@login_required
+def add_event():
+    form = AddEventForm()
+    if form.validate_on_submit():
+        event = EducationEvent(
+            user_id=current_user.id,
+            title=form.title.data,
+            description=None,
+            date=form.date.data,
+            time=form.time.data,
+            notes=form.notes.data
+        )
+        db.session.add(event)
+        db.session.commit()
+    return redirect(url_for('education.render_education_page'))
+
+
+@bp.route('/import', methods=['POST'])
+@login_required
+def import_ics():
+    ics_file = request.files.get('ics_file')
+    if ics_file and ics_file.filename.endswith('.ics'):
+        file_path = os.path.join('uploads', f"{current_user.id}_{ics_file.filename}")
+        os.makedirs('uploads', exist_ok=True)
+        ics_file.save(file_path)
+
+
+        print(f".ics file saved to: {file_path}")
+
+    return redirect(url_for('education.render_education_page'))
 
 @bp.route('/', methods=['GET'])
 @bp.route('/schedule', methods=['GET'])
@@ -23,48 +64,27 @@ def schedule():
     """
     form = AddEventForm()
 
-    # Calculate this week’s bounds (Monday–Sunday)
+    
     today = datetime.today().date()
     start_of_week = today - timedelta(days=today.weekday())
-    end_of_week   = start_of_week + timedelta(days=6)
+    end_of_week = start_of_week + timedelta(days=6)
 
-    # Fetch events in the current week
-    week_events = (
-        EducationEvent.query
-        .filter(
-            EducationEvent.user_id == current_user.id,
-            EducationEvent.date >= start_of_week,
-            EducationEvent.date <= end_of_week
-        )
-        .order_by(EducationEvent.date, EducationEvent.time)
-        .all()
-    )
+    
+    week_events = EducationEvent.query.filter(
+        EducationEvent.user_id == current_user.id,
+        EducationEvent.date >= start_of_week,
+        EducationEvent.date <= end_of_week
+    ).order_by(EducationEvent.date.asc(), EducationEvent.time.asc()).all()
 
-    # Group weekly events by day label
-    schedule_dict = defaultdict(list)
-    for ev in week_events:
-        day_label  = ev.date.strftime('%A, %d %B %Y')
-        time_label = ev.time.strftime('%H:%M')
-        schedule_dict[day_label].append(f"{time_label} {ev.title}")
+    
+    schedule = {}
+    for event in week_events:
+        day_str = event.date.strftime('%A, %d %B %Y')
+        time_str = event.time.strftime('%H:%M')
+        schedule.setdefault(day_str, []).append(f"{time_str} {event.title}")
 
-    # Fetch *all* future events for the Upcoming section & alarms
-    all_events = (
-        EducationEvent.query
-        .filter(EducationEvent.user_id == current_user.id)
-        .order_by(EducationEvent.date, EducationEvent.time)
-        .all()
-    )
-
-    # Build JSON-serializable upcoming_events (only those > now)
-    now = datetime.now()
-    upcoming_events = []
-    for ev in all_events:
-        ev_dt = datetime.combine(ev.date, ev.time)
-        if ev_dt > now:
-            upcoming_events.append({
-                "title": ev.title,
-                "start": ev_dt.isoformat()
-            })
+    
+    all_events = EducationEvent.query.filter_by(user_id=current_user.id).order_by(EducationEvent.date.asc()).all()
 
     return render_template(
         'education/schedule.html',
@@ -77,22 +97,17 @@ def schedule():
 
 @bp.route('/calendar')
 @login_required
-def calendar():
-    """
-    Render a FullCalendar month view populated from DB.
-    """
-    events = EducationEvent.query.filter_by(user_id=current_user.id).all()
-    calendar_data = [
-        {
-            "title": ev.title,
-            "start": datetime.combine(ev.date, ev.time).isoformat()
-        }
-        for ev in events
-    ]
-    return render_template(
-        'education/calendar.html',
-        calendar_data=calendar_data
-    )
+def import_ics():
+    ics_file = request.files.get('ics_file')
+    if ics_file and ics_file.filename.endswith('.ics'):
+        file_path = os.path.join('uploads', f"{current_user.id}_{ics_file.filename}")
+        os.makedirs('uploads', exist_ok=True)
+        ics_file.save(file_path)
+
+        
+        print(f".ics file saved to: {file_path}")
+
+    return redirect(url_for('education.render_education_page'))
 
 
 @bp.route('/add', methods=['POST'])
@@ -103,13 +118,13 @@ def add_event():
     """
     form = AddEventForm()
     if form.validate_on_submit():
-        new_ev = EducationEvent(
-            user_id    = current_user.id,
-            title      = form.title.data,
-            description= '',
-            date       = form.date.data,
-            time       = form.time.data,
-            notes      = form.notes.data
+        event = EducationEvent(
+            user_id=current_user.id,
+            title=form.title.data,
+            description='',  
+            date=form.date.data,
+            time=form.time.data,
+            notes=form.notes.data
         )
         db.session.add(new_ev)
         db.session.commit()

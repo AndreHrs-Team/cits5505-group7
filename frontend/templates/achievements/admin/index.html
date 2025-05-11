@@ -41,7 +41,15 @@
                             <tr>
                                 <td>{{ achievement.id }}</td>
                                 <td>
-                                    <i class="fas fa-{{ achievement.icon|default('medal') }} text-{{ achievement.level }}"></i>
+                                    {% if achievement.icon %}
+                                        {% if achievement.icon in ['heart-pulse', 'heart', 'heart-circle', 'shoe-prints', 'person-walking', 'walking', 'weight', 'bullseye', 'trophy', 'moon', 'bed', 'stars', 'chart-line', 'list-check', 'crown'] %}
+                                            <i class="fas fa-{{ achievement.icon }} text-{{ achievement.level }}"></i>
+                                        {% else %}
+                                            <i class="fas fa-medal text-{{ achievement.level }}"></i>
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="fas fa-medal text-{{ achievement.level }}"></i>
+                                    {% endif %}
                                     <span class="ms-2">{{ achievement.name }}</span>
                                 </td>
                                 <td>{{ achievement.category|capitalize }}</td>

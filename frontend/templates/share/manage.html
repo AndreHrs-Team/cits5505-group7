@@ -27,6 +27,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Template</th>
+                            <th>Modules</th>
                             <th>Created</th>
                             <th>Expires</th>
                             <th>Access Count</th>
@@ -43,6 +44,16 @@
                                 {% else %}
                                 <span class="badge bg-info">Medical</span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                {% set modules = link.modules_list %}
+                                {% if 'finance' in modules %}<span class="badge bg-success">Finance</span> {% endif %}
+                                {% if 'education' in modules %}<span class="badge bg-info">Education</span> {% endif %}
+                                {% if 'activity' in modules %}<span class="badge bg-secondary">Activity</span> {% endif %}
+                                {% if 'weight' in modules %}<span class="badge bg-warning text-dark">Weight</span> {% endif %}
+                                {% if 'sleep' in modules %}<span class="badge bg-dark">Sleep</span> {% endif %}
+                                {% if 'goals' in modules %}<span class="badge bg-primary">Goals</span> {% endif %}
+                                {% if 'achievements' in modules %}<span class="badge bg-danger">Achievements</span> {% endif %}
                             </td>
                             <td>{{ link.created_at.strftime('%Y-%m-%d') }}</td>
                             <td>
@@ -186,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <tr>
                                     <th>Name</th>
                                     <th>Template</th>
+                                    <th>Modules</th>
                                     <th>Created</th>
                                     <th>Expires</th>
                                     <th>Access Count</th>
@@ -225,6 +237,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
+            // 动态渲染modules列
+            const modules = link.modules || [];
+            let modulesHtml = '';
+            if (modules.includes('finance')) modulesHtml += '<span class="badge bg-success">Finance</span> ';
+            if (modules.includes('education')) modulesHtml += '<span class="badge bg-info">Education</span> ';
+            if (modules.includes('activity')) modulesHtml += '<span class="badge bg-secondary">Activity</span> ';
+            if (modules.includes('weight')) modulesHtml += '<span class="badge bg-warning text-dark">Weight</span> ';
+            if (modules.includes('sleep')) modulesHtml += '<span class="badge bg-dark">Sleep</span> ';
+            if (modules.includes('goals')) modulesHtml += '<span class="badge bg-primary">Goals</span> ';
+            if (modules.includes('achievements')) modulesHtml += '<span class="badge bg-danger">Achievements</span> ';
+
             row.innerHTML = `
                 <td>${link.name || 'Unnamed Link'}</td>
                 <td>
@@ -232,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ? '<span class="badge bg-primary">Social</span>' 
                         : '<span class="badge bg-info">Medical</span>'}
                 </td>
+                <td>${modulesHtml}</td>
                 <td>${formattedCreatedDate}</td>
                 <td>${expiryBadge}</td>
                 <td>${link.access_count || 0}</td>
