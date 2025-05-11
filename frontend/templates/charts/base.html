@@ -1,5 +1,7 @@
 {% extends "fitness_component/fitness_navtab.html" %} {% block title %}{{ title
 }}{% endblock %} {% block extra_css %}
+
+
 <style>
   .toggle-btn-group {
     display: inline-flex;
@@ -11,6 +13,7 @@
     gap: 0;
     margin-bottom: 1.5rem;
   }
+
   .toggle-btn {
     border: none;
     background: transparent;
@@ -32,21 +35,26 @@
     justify-content: center;
     text-decoration: none;
   }
+
   .toggle-btn:first-child {
     border-radius: 999px 0 0 999px;
   }
+
   .toggle-btn:last-child {
     border-radius: 0 999px 999px 0;
   }
+
   .toggle-btn:not(:last-child) {
     border-right: 1px solid #c2eaea;
   }
+
   .toggle-btn.active,
   .toggle-btn:active {
     background: #4ecdd4;
     color: #fff;
     z-index: 1;
   }
+
   .toggle-btn:not(.active):hover {
     background: #b2ebf2;
     color: #0097a7;
@@ -62,41 +70,22 @@
         </div>
         <div class="card-body">
           <div class="d-flex justify-content-center mb-4">
-            <div
-              class="toggle-btn-group"
-              role="group">
-              <a
-                href="{{ url_for(endpoint + '.daily') }}"
-                class="toggle-btn {% if period == 'daily' %}active{% endif %}"
-                >Daily</a
-              >
-              <a
-                href="{{ url_for(endpoint + '.weekly') }}"
-                class="toggle-btn {% if period == 'weekly' %}active{% endif %}"
-                >Weekly</a
-              >
-              <a
-                href="{{ url_for(endpoint + '.monthly') }}"
-                class="toggle-btn {% if period == 'monthly' %}active{% endif %}"
-                >Monthly</a
-              >
-              <a
-                href="{{ url_for(endpoint + '.six_months') }}"
-                class="toggle-btn {% if period == 'six_months' %}active{% endif %}"
-                >6 Months</a
-              >
-              <a
-                href="{{ url_for(endpoint + '.yearly') }}"
-                class="toggle-btn {% if period == 'yearly' %}active{% endif %}"
-                >Yearly</a
-              >
+            <div class="toggle-btn-group" role="group">
+              <a href="{{ url_for(endpoint + '.daily') }}"
+                class="toggle-btn {% if period == 'daily' %}active{% endif %}">Daily</a>
+              <a href="{{ url_for(endpoint + '.weekly') }}"
+                class="toggle-btn {% if period == 'weekly' %}active{% endif %}">Weekly</a>
+              <a href="{{ url_for(endpoint + '.monthly') }}"
+                class="toggle-btn {% if period == 'monthly' %}active{% endif %}">Monthly</a>
+              <a href="{{ url_for(endpoint + '.six_months') }}"
+                class="toggle-btn {% if period == 'six_months' %}active{% endif %}">6 Months</a>
+              <a href="{{ url_for(endpoint + '.yearly') }}"
+                class="toggle-btn {% if period == 'yearly' %}active{% endif %}">Yearly</a>
             </div>
           </div>
 
           {% if endpoint != 'activities' %}
-          <div
-            class="chart-container"
-            style="position: relative; height: 400px">
+          <div class="chart-container" style="position: relative; height: 400px">
             <canvas id="dataChart"></canvas>
           </div>
           {% endif %}
@@ -107,76 +96,82 @@
 </div>
 {% endblock %} {% block scripts %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-      var data = {{ data|tojson }};
+  document.addEventListener('DOMContentLoaded', function () {
+    var data = {{ data| tojson
+  }};
 
-      {% if endpoint == 'activities' %}
-      // Activity chart is handled in the activity.html template
-      {% else %}
-      // Create charts for other types (heart_rate, sleep, weight)
-      var chartPeriod = "{{ period }}";
-      var periodTitle = '{{ period|capitalize }}';
+  {% if endpoint == 'activities' %}
+  // Activity chart is handled in the activity.html template
+  {% else %}
+  // Create charts for other types (heart_rate, sleep, weight)
+  var chartPeriod = "{{ period }}";
+  var periodTitle = '{{ period|capitalize }}';
 
-      if (periodTitle === 'Six_months') {
-          periodTitle = '6-Month Average';
-      } else if (periodTitle === 'Daily') {
-          periodTitle = 'Daily';
-      } else {
-          periodTitle += ' Average';
-      }
+  if (periodTitle === 'Six_months') {
+    periodTitle = '6-Month Average';
+  } else if (periodTitle === 'Daily') {
+    periodTitle = 'Daily';
+  } else {
+    periodTitle += ' Average';
+  }
 
-      var chartTitle = '';
+  var chartTitle = '';
 
-      {% if endpoint == 'heartbeats' %}
-      chartTitle = periodTitle + ' Heart Rate';
-      {% elif endpoint == 'sleep' %}
-      chartTitle = periodTitle + ' Sleep';
-      {% elif endpoint == 'weight' %}
-      chartTitle = periodTitle + ' Weight';
-      {% endif %}
+  {% if endpoint == 'heartbeats' %}
+  chartTitle = periodTitle + ' Heart Rate';
+  {% elif endpoint == 'sleep' %}
+  chartTitle = periodTitle + ' Sleep';
+  {% elif endpoint == 'weight' %}
+  chartTitle = periodTitle + ' Weight';
+  {% endif %}
 
-      var ctx = document.getElementById('dataChart').getContext('2d');
+  var ctx = document.getElementById('dataChart').getContext('2d');
 
-      // Function to detect if sparse labels are being used
-      function hasSparseLabels() {
-          // If data has labels and at least one empty label, consider it sparse
-          return data.labels && data.labels.some(function(label) { return label === ''; });
-      }
+  // Function to detect if sparse labels are being used
+  function hasSparseLabels() {
+    // If data has labels and at least one empty label, consider it sparse
+    return data.labels && data.labels.some(function (label) { return label === ''; });
+  }
 
-      // Check if we're using sparse labels
-      var usingSparseLabels = hasSparseLabels();
+  // Check if we're using sparse labels
+  var usingSparseLabels = hasSparseLabels();
 
-      new Chart(ctx, {
-          type: 'bar',
-          data: data,
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                  title: {
-                      display: true,
-                      text: chartTitle
-                  },
-                  legend: {
-                      position: 'top',
-                  }
-              },
-              scales: {
-                  y: {
-                      beginAtZero: true
-                  },
-                  x: {
-                      ticks: {
-                          // Display all labels horizontally (no rotation)
-                          autoSkip: false,
-                          maxRotation: 0,
-                          minRotation: 0
-                      }
-                  }
-              }
+  new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: chartTitle
+        },
+        legend: {
+          position: 'top',
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        },
+        x: {
+          ticks: {
+            // Display all labels horizontally (no rotation)
+            autoSkip: false,
+            maxRotation: 0,
+            minRotation: 0
           }
-      });
-      {% endif %}
+        }
+      }
+    }
   });
+  {% endif %}
+  });
+
+
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}

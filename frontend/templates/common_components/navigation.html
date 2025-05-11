@@ -1,9 +1,7 @@
 <!-- Navigation with theme toggle at rightmost position -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a
-      class="navbar-brand"
-      href="{{ url_for('main.index') }}">
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">
       <div class="d-flex flex-row align-items-center">
         <i class="fa-solid fa-parachute-box me-2"></i>
         <div class="navbar-brand d-flex flex-column p-0">
@@ -12,236 +10,149 @@
         </div>
       </div>
     </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div
-      class="collapse navbar-collapse"
-      id="navbarNav">
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle fw-semibold 
+          <a class="nav-link dropdown-toggle fw-semibold 
           {{ 'navbar-active' if request.endpoint and request.endpoint in 
             ['dashboard.get_dashboard_data', 'activities.daily', 'heartbeats.daily', 'sleep.daily', 'weight.daily', 'goals.index', 'achievements.index'] }}"
-            href="{{ url_for('dashboard.get_dashboard_data') }}"
-            data-bs-toggle="dropdown"
-            ><i class="fas fa-dumbbell me-1"></i>Fitness Tracker</a
-          >
+            href="{{ url_for('dashboard.get_dashboard_data') }}" data-bs-toggle="dropdown"><i
+              class="fas fa-dumbbell me-1"></i>Fitness Tracker</a>
           <ul class="dropdown-menu">
-            <li
-              ><a
-                class="dropdown-item"
-                href="{{ url_for('dashboard.get_dashboard_data') }}"
-                ><i class="fas fa-chart-line"></i> Dashboard</a
-              ></li
-            >
+            <li><a class="dropdown-item" href="{{ url_for('dashboard.get_dashboard_data') }}"><i
+                  class="fas fa-chart-line"></i> Dashboard</a></li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('activities.daily') }}"
-                ><i class="fas fa-walking"></i> Activity</a
-              >
+              <a class="dropdown-item" href="{{ url_for('activities.daily') }}"><i class="fas fa-walking"></i>
+                Activity</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('heartbeats.daily') }}"
-                ><i class="fas fa-heartbeat"></i> Heart Rate</a
-              >
+              <a class="dropdown-item" href="{{ url_for('heartbeats.daily') }}"><i class="fas fa-heartbeat"></i> Heart
+                Rate</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('sleep.daily') }}"
-                ><i class="fas fa-bed"></i> Sleep</a
-              >
+              <a class="dropdown-item" href="{{ url_for('sleep.daily') }}"><i class="fas fa-bed"></i> Sleep</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('weight.daily') }}"
-                ><i class="fas fa-weight"></i> Weight</a
-              >
+              <a class="dropdown-item" href="{{ url_for('weight.daily') }}"><i class="fas fa-weight"></i> Weight</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('goals.index') }}"
-                ><i class="fas fa-bullseye"></i> Goals</a
-              >
+              <a class="dropdown-item" href="{{ url_for('goals.index') }}"><i class="fas fa-bullseye"></i> Goals</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('achievements.index') }}"
-                ><i class="fas fa-trophy"></i> Achievements</a
-              >
+              <a class="dropdown-item" href="{{ url_for('achievements.index') }}"><i class="fas fa-trophy"></i>
+                Achievements</a>
             </li>
           </ul>
         </li>
 
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle fw-semibold 
+          <a class="nav-link dropdown-toggle fw-semibold 
               {{ 'navbar-active' if request.endpoint and request.endpoint.startswith('finance.') }}"
-            href="{{ url_for('finance.render_finance_page') }}"
-            data-bs-toggle="dropdown">
+            href="{{ url_for('finance.render_finance_page') }}" data-bs-toggle="dropdown">
             <i class="fa-solid fa-money-bill"></i> Finance
           </a>
           <ul class="dropdown-menu">
-            <li
-              ><a
-                class="dropdown-item"
-                href="{{ url_for('finance.render_finance_page') }}"
-                ><i class="fa-solid fa-money-bill-transfer"></i> Transaction</a
-              ></li
-            >
-            <li
-              ><a
-                class="dropdown-item"
-                href="{{ url_for('finance.render_finance_categories_page') }}"
-                ><i class="fa-solid fa-cubes-stacked"></i> Categories</a
-              ></li
-            >
-            <li
-              ><a
-                class="dropdown-item"
-                href="{{ url_for('finance.render_finance_accounts_page') }}"
-                ><i class="fa-solid fa-credit-card"></i> Accounts</a
-              ></li
-            >
-            <li
-              ><a
-                class="dropdown-item"
-                href="{{ url_for('finance.render_finance_insight_page') }}"
-                ><i class="fa-solid fa-money-bill-trend-up"></i> Insight</a
-              ></li
-            >
+            <li><a class="dropdown-item" href="{{ url_for('finance.render_finance_page') }}"><i
+                  class="fa-solid fa-money-bill-transfer"></i> Transaction</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('finance.render_finance_categories_page') }}"><i
+                  class="fa-solid fa-cubes-stacked"></i> Categories</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('finance.render_finance_accounts_page') }}"><i
+                  class="fa-solid fa-credit-card"></i> Accounts</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('finance.render_finance_insight_page') }}"><i
+                  class="fa-solid fa-money-bill-trend-up"></i> Insight</a></li>
+          </ul>
+          <!-- in frontend/templates/base.html, inside your <ul class="navbar-nav"> -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle fw-semibold
+                  {{ 'navbar-active' if request.endpoint and request.endpoint.startswith('education.') }}" href="#"
+            id="educationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-book me-1"></i>
+            Education
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="educationDropdown">
+            <li>
+              <a class="dropdown-item" href="{{ url_for('education.schedule') }}">
+                <i class="fa-solid fa-list-check me-1"></i>
+                Schedule
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('education.calendar') }}">
+                <i class="fa-solid fa-calendar-days me-1"></i>
+                Calendar
+              </a>
+            </li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a
-            class="nav-link fw-semibold 
-          {{ 'navbar-active' if request.endpoint and request.endpoint.startswith('education.') }}"
-            href="{{ url_for('education.render_education_page') }}"
-            ><i class="fa-solid fa-book me-1"></i>Education</a
-          >
-        </li>
+
+
       </ul>
       <ul class="navbar-nav ms-auto">
         {% if current_user.is_authenticated %}
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="{{ url_for('upload.upload_file') }}"
-            ><i class="fas fa-upload"></i> Upload</a
-          >
+          <a class="nav-link" href="{{ url_for('upload.upload_file') }}"><i class="fas fa-upload"></i> Upload</a>
         </li>
         <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="userDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
             aria-expanded="false">
             <i class="fas fa-user"></i>
             {% if current_user.first_name %} {{ current_user.get_full_name() }}
             {% else %} {{ current_user.username }} {% endif %}
           </a>
-          <ul
-            class="dropdown-menu dropdown-menu-end"
-            aria-labelledby="userDropdown">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('user.profile') }}"
-                ><i class="fas fa-id-card"></i> My Profile</a
-              >
+              <a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="fas fa-id-card"></i> My
+                Profile</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('user.change_password') }}"
-                ><i class="fas fa-key"></i> Change Password</a
-              >
+              <a class="dropdown-item" href="{{ url_for('user.change_password') }}"><i class="fas fa-key"></i> Change
+                Password</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('user.account') }}"
-                ><i class="fas fa-cog"></i> Account Settings</a
-              >
-            </li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('share.manage') }}"
-                ><i class="fas fa-share-alt"></i> Share My Data</a
-              >
+              <a class="dropdown-item" href="{{ url_for('user.account') }}"><i class="fas fa-cog"></i> Account
+                Settings</a>
             </li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('user.export_data') }}"
-                ><i class="fas fa-file-export"></i> Export Data</a
-              >
+              <hr class="dropdown-divider" />
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('share.manage') }}"><i class="fas fa-share-alt"></i> Share My
+                Data</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('user.export_data') }}"><i class="fas fa-file-export"></i>
+                Export Data</a>
             </li>
             {% if current_user.is_admin %}
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('achievements.admin_index') }}"
-                ><i class="fas fa-medal"></i> Manage Achievements</a
-              >
+              <a class="dropdown-item" href="{{ url_for('achievements.admin_index') }}"><i class="fas fa-medal"></i>
+                Manage Achievements</a>
             </li>
             {% endif %}
-            <li><hr class="dropdown-divider" /></li>
             <li>
-              <a
-                class="dropdown-item"
-                href="{{ url_for('auth.logout') }}"
-                ><i class="fas fa-sign-out-alt"></i> Logout</a
-              >
+              <hr class="dropdown-divider" />
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i>
+                Logout</a>
             </li>
           </ul>
         </li>
         <li class="nav-item">
-          <a
-            href="#"
-            id="theme-toggle"
-            class="nav-link theme-toggle"
-            ><i class="fas fa-moon"></i
-          ></a>
+          <a href="#" id="theme-toggle" class="nav-link theme-toggle"><i class="fas fa-moon"></i></a>
         </li>
         {% else %}
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="{{ url_for('auth.login') }}"
-            >Login</a
-          >
+          <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="{{ url_for('auth.register') }}"
-            >Register</a
-          >
+          <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
         </li>
         <li class="nav-item">
-          <a
-            href="#"
-            id="theme-toggle"
-            class="nav-link theme-toggle"
-            ><i class="fas fa-moon"></i
-          ></a>
+          <a href="#" id="theme-toggle" class="nav-link theme-toggle"><i class="fas fa-moon"></i></a>
         </li>
         {% endif %}
       </ul>

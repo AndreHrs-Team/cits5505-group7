@@ -6,7 +6,7 @@ from wtforms import SubmitField
 
 class AddEventForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
-    date = DateField('Date', validators=[DataRequired()])
-    time = TimeField('Time', validators=[DataRequired()])
+    date  = DateField('Date',  validators=[DataRequired()], format='%Y-%m-%d')
+    time  = TimeField('Time',  validators=[DataRequired()], format='%H:%M')
     notes = TextAreaField('Notes')
-    submit = SubmitField('Add Event')
+    submit = SubmitField('Add new event')
