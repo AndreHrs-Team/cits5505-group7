@@ -41,6 +41,7 @@ def import_ics():
         ics_file.save(file_path)
 
 
+
         print(f".ics file saved to: {file_path}")
 
     return redirect(url_for('education.render_education_page'))

@@ -57,3 +57,6 @@ flake8==6.1.0
 
 # PDF Generation
 WeasyPrint>=60
+
+# calendar package
+icalendar>=4.0.0
