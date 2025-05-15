@@ -1981,4 +1981,14 @@ body span.badge.bg-bronze {
 .dark-mode .text-muted,
 .dark-mode .form-text {
     color: var(--text-secondary) !important;
+}
+
+/* Improve visibility of admin action buttons in dark mode */
+.dark-mode .table .btn-sm.btn-primary,
+.dark-mode .table .btn-sm.btn-info {
+    background-color: #00d6e3 !important; /* Brighter turquoise */
+    border-color: #00d6e3 !important;
+    color: #000000 !important; /* Black text */
+    font-weight: 700 !important; /* Bold text */
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5) !important; /* White glow around text */
 } 
