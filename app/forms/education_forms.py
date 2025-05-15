@@ -3,6 +3,8 @@ from wtforms import StringField, DateField, TimeField, TextAreaField
 from wtforms.validators import DataRequired
 from wtforms import SubmitField
 
+from wtforms import SubmitField
+
 
 class AddEventForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
