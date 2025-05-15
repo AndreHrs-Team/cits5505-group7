@@ -1631,50 +1631,6 @@ a:hover {
     font-weight: 500;
 }
 
-/* Improve table border visibility */
-.dark-mode .table,
-.dark-mode .table th,
-.dark-mode .table td {
-    border-color: rgba(100, 100, 100, 0.5) !important;
-}
-
-/* Fix text visibility issues in achievement pages in dark mode */
-.dark-mode tbody tr td,
-.dark-mode .table span,
-.dark-mode .table div {
-    color: white !important;
-}
-
-/* Fix all types of special rows */
-.dark-mode tr:nth-child(9) td,  /* Sleep Routine row */
-.dark-mode tr:nth-child(3) td,  /* First Steps row */
-.dark-mode tr:nth-child(6) td,  /* Goal Achiever: Steps row */
-.dark-mode tr:nth-child(12) td, /* Silver row */
-.dark-mode tr:nth-child(15) td  /* Weight row */
-{
-    color: white !important;
-    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);
-}
-
-/* Handle all rows with background colors */
-.dark-mode tr[style*="background"] {
-    color: white !important;
-}
-
-/* Ensure column headers are clearly visible in dark mode */
-.dark-mode thead th {
-    color: var(--primary) !important;
-    font-weight: 700 !important;
-    background-color: rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Ensure text is visible in table cells with specific backgrounds */
-.dark-mode td[style*="background"],
-.dark-mode tr[style*="background"] td {
-    color: white !important;
-    font-weight: 500;
-}
-
 /* Badges */
 
 /* Enhanced contrast for different level texts */
@@ -1895,4 +1851,86 @@ body:not(.dark-mode) .theme-toggle i.fas.fa-moon {
     display: inline-block;
     visibility: visible;
     opacity: 1;
+}
+
+/* Improve visibility for data cells in dark mode - use dark text on light backgrounds */
+.dark-mode .table td,
+.dark-mode .card-body > div {
+    background-color: var(--card-bg); /* Keep existing dark background */
+    color: var(--text-primary); /* Keep white text on dark backgrounds */
+}
+
+/* Target the specific white containers in dark mode - those need dark text */
+.dark-mode .table td[style*="background-color:#fff"],
+.dark-mode .table td[style*="background-color: #fff"],
+.dark-mode .table td[style*="background-color: rgb(255, 255, 255)"],
+.dark-mode .table td[style*="background-color:#ffffff"],
+.dark-mode .table td[style*="background-color: #ffffff"],
+.dark-mode .table td[style*="background: white"],
+.dark-mode .card-body .bg-white,
+.dark-mode .card-body [style*="background-color: white"],
+.dark-mode .card-body [style*="background-color:#fff"],
+.dark-mode .card-body [style*="background-color: #fff"] {
+    color: #1D1E20 !important; /* Dark text color */
+}
+
+/* Make any text inside these light containers also dark */
+.dark-mode .table td[style*="background-color:#fff"] *,
+.dark-mode .table td[style*="background-color: #fff"] *,
+.dark-mode .card-body .bg-white *,
+.dark-mode .card-body [style*="background-color: white"] * {
+    color: #1D1E20 !important;
+}
+
+/* Fix for basic info cards with light background */
+.dark-mode .card.bg-white,
+.dark-mode .card[style*="background-color: white"],
+.dark-mode .card[style*="background-color:#fff"] {
+    background-color: #1D1E20 !important; /* Make card background dark */
+    border-color: #2D333B !important;
+}
+
+/* Fix dark mode table issues with white cells */
+.dark-mode .table {
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+/* Make white background cells have dark backgrounds in dark mode */
+.dark-mode .card-body table td,
+.dark-mode .card-body table th {
+    background-color: #1D1E20 !important; /* Dark background */
+    color: #FFFFFF !important; /* White text */
+    border-color: #2D333B !important;
+}
+
+/* Fix first column (empty white boxes) in import details table */
+.dark-mode .table tr td:first-child,
+.dark-mode .table tr th:first-child {
+    background-color: #1D1E20 !important;
+    color: #FFFFFF !important;
+}
+
+/* Add specific fix for the import history details page */
+.dark-mode .table-responsive .table-striped tr td,
+.dark-mode .table-responsive .table-striped tr th {
+    background-color: #1D1E20 !important;
+    color: #FFFFFF !important;
+}
+
+/* Ensure borders are visible */
+.dark-mode .table td, 
+.dark-mode .table th {
+    border-color: #2D333B !important;
+}
+
+/* Make alternating rows slightly different for better visibility */
+.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #23272b !important;
+    color: #FFFFFF !important;
+}
+
+.dark-mode .table-striped > tbody > tr:nth-of-type(even) > * {
+    background-color: #1D1E20 !important;
+    color: #FFFFFF !important;
 } 
