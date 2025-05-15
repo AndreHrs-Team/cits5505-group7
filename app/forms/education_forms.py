@@ -12,3 +12,4 @@ class AddEventForm(FlaskForm):
     time = TimeField('Time', validators=[DataRequired()])
     notes = TextAreaField('Notes')
     submit = SubmitField('Add Event')
+    description = TextAreaField('Description')
