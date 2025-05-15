@@ -1200,11 +1200,23 @@ a:hover {
 }
 
 .goal-progress {
-    height: 10px;
+    height: 25px;
     border-radius: 5px;
     margin-bottom: 1rem;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goal-progress .progress-text {
+    position: absolute;
+    z-index: 2;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .goal-card.steps .goal-progress .progress-bar {
