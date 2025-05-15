@@ -1957,4 +1957,16 @@ body span.badge.bg-bronze {
     color: white !important;
     font-weight: 700 !important;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Add styling for form labels in dark mode */
+.dark-mode label:not(.form-check-label),
+.dark-mode .form-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.dark-mode .text-muted,
+.dark-mode .form-text {
+    color: var(--text-secondary) !important;
 } 
