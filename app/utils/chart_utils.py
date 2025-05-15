@@ -6,6 +6,10 @@ from typing import Dict, List, Tuple, Any, Optional, Union
 CHART_COLORS = {
     'primary': '#00B0B9',          # Blue-green (primary color)
     'sleep': '#7177F7',            # Light purple (for sleep data)
+    'deep_sleep': '#000080',       # Navy blue for deep sleep
+    'light_sleep': '#00A0E4',      # Bright blue for light sleep
+    'rem_sleep': '#8A2BE2',        # Purple for REM sleep
+    'awake': '#FF2D55',            # Red for awake time
     'heart_rate': '#FF2D55',       # Coral red (for heart rate data)
     'activity': '#4CD964',         # Bright green (for activity data)
     'weight': '#5AC8FA',           # Sky blue (for weight data)
@@ -224,7 +228,19 @@ def prepare_chart_data(
         borderColor = config.get('borderColor', CHART_COLORS['primary'])
         
         # Automatically select colors based on metric name
-        if 'heart' in metric.lower() or 'pulse' in metric.lower():
+        if metric.lower() == 'deep_sleep':
+            backgroundColor = CHART_COLORS['deep_sleep']
+            borderColor = CHART_COLORS['deep_sleep']
+        elif metric.lower() == 'light_sleep':
+            backgroundColor = CHART_COLORS['light_sleep']
+            borderColor = CHART_COLORS['light_sleep']
+        elif metric.lower() == 'rem_sleep':
+            backgroundColor = CHART_COLORS['rem_sleep']
+            borderColor = CHART_COLORS['rem_sleep']
+        elif metric.lower() == 'awake':
+            backgroundColor = CHART_COLORS['awake']
+            borderColor = CHART_COLORS['awake']
+        elif 'heart' in metric.lower() or 'pulse' in metric.lower():
             backgroundColor = CHART_COLORS['heart_rate']
             borderColor = CHART_COLORS['heart_rate']
         elif 'sleep' in metric.lower() or 'rest' in metric.lower():
@@ -238,7 +254,7 @@ def prepare_chart_data(
             borderColor = CHART_COLORS['activity']
         
         # Create custom version with transparency
-        backgroundColor = add_alpha(backgroundColor, 0.5)
+        backgroundColor = add_alpha(backgroundColor, 0.7)  # Increased opacity for better visibility
         
         dataset = {
             'label': config['label'],
