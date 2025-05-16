@@ -5,6 +5,10 @@ import json
 from flask import current_app, render_template
 from weasyprint import HTML, CSS
 from app.models import User, SharedLink, Weight, HeartRate, Activity, Sleep, Goal, Achievement, UserAchievement
+from app.models.finance.account import Account
+from app.models.finance.transaction import Transaction
+from app.models.finance.category import Category
+from app.models.education_event import EducationEvent
 
 class PDFService:
     """Service for generating PDF reports from shared health data"""
@@ -92,6 +96,13 @@ class PDFService:
             
         if "achievements" in modules:
             data['achievements'] = PDFService._get_achievements_data(user.id, share_link)
+            
+        # Add finance and education data if those modules are present
+        if "finance" in modules:
+            data['finance'] = PDFService._get_finance_data(user.id, share_link)
+            
+        if "education" in modules:
+            data['education'] = PDFService._get_education_data(user.id, share_link)
         
         return data
     
@@ -103,25 +114,60 @@ class PDFService:
             Weight.user_id == user_id,
             Weight.timestamp >= share_link.date_range_start,
             Weight.timestamp <= share_link.date_range_end
-        ).order_by(Weight.timestamp.desc()).all()
+        ).order_by(Weight.timestamp.asc()).all()
         
         heart_rates = HeartRate.query.filter(
             HeartRate.user_id == user_id,
             HeartRate.timestamp >= share_link.date_range_start,
             HeartRate.timestamp <= share_link.date_range_end
-        ).order_by(HeartRate.timestamp.desc()).all()
+        ).order_by(HeartRate.timestamp.asc()).all()
         
         activities = Activity.query.filter(
             Activity.user_id == user_id,
             Activity.timestamp >= share_link.date_range_start,
             Activity.timestamp <= share_link.date_range_end
-        ).order_by(Activity.timestamp.desc()).all()
+        ).order_by(Activity.timestamp.asc()).all()
         
         sleeps = Sleep.query.filter(
             Sleep.user_id == user_id,
             Sleep.timestamp >= share_link.date_range_start,
             Sleep.timestamp <= share_link.date_range_end
-        ).order_by(Sleep.timestamp.desc()).all()
+        ).order_by(Sleep.timestamp.asc()).all()
+        
+        # Process activities to get daily summaries
+        daily_activities = {}
+        for activity in activities:
+            date_key = activity.timestamp.date()
+            if date_key not in daily_activities:
+                daily_activities[date_key] = {
+                    'date': date_key.strftime('%Y-%m-%d'),
+                    'steps': 0,
+                    'distance': 0,
+                    'calories': 0
+                }
+            
+            # Add steps from total_steps field if available
+            if activity.total_steps is not None:
+                daily_activities[date_key]['steps'] = max(daily_activities[date_key]['steps'], activity.total_steps)
+            
+            # Add distance from total_distance field if available
+            if activity.total_distance is not None:
+                daily_activities[date_key]['distance'] = max(daily_activities[date_key]['distance'], activity.total_distance)
+            
+            # Add calories from calories field if available
+            if activity.calories is not None:
+                daily_activities[date_key]['calories'] = max(daily_activities[date_key]['calories'], activity.calories)
+            
+            # Otherwise process by activity_type
+            elif activity.activity_type == 'steps' and activity.value is not None:
+                daily_activities[date_key]['steps'] += activity.value
+            elif activity.activity_type == 'distance' and activity.value is not None:
+                daily_activities[date_key]['distance'] += activity.value
+            elif activity.activity_type == 'calories' and activity.value is not None:
+                daily_activities[date_key]['calories'] += activity.value
+        
+        # Convert daily activity dict to list - sort by date ascending (small to large)
+        activity_summary = [v for k, v in sorted(daily_activities.items())]
         
         # Process data based on privacy level
         if share_link.privacy_level == 'overview':
@@ -129,18 +175,18 @@ class PDFService:
             data = {
                 'weights': [{'date': w.timestamp.strftime('%Y-%m-%d'), 'value': w.value, 'unit': w.unit} for w in weights[:7]],
                 'heart_rates': [{'date': hr.timestamp.strftime('%Y-%m-%d'), 'value': hr.value, 'unit': hr.unit} for hr in heart_rates[:7]],
-                'activities': [{'date': a.timestamp.strftime('%Y-%m-%d'), 'steps': a.value} for a in activities[:7]],
+                'activities': activity_summary[:7],
                 'sleeps': [{'date': s.timestamp.strftime('%Y-%m-%d'), 'duration': s.duration / 60} for s in sleeps[:7]],
                 'summary': {
-                    'weight': {'latest': weights[0].value if weights else 0},
+                    'weight': {'latest': weights[-1].value if weights else 0},
                     'heart_rate': {
                         'min': min([hr.value for hr in heart_rates]) if heart_rates else 0,
                         'max': max([hr.value for hr in heart_rates]) if heart_rates else 0,
                         'avg': sum([hr.value for hr in heart_rates]) / len(heart_rates) if heart_rates else 0
                     },
                     'activity': {
-                        'avg_steps': sum([a.value for a in activities]) / len(activities) if activities else 0,
-                        'total_steps': sum([a.value for a in activities]) if activities else 0
+                        'avg_steps': sum([a['steps'] for a in activity_summary]) / len(activity_summary) if activity_summary else 0,
+                        'total_steps': sum([a['steps'] for a in activity_summary]) if activity_summary else 0
                     },
                     'sleep': {
                         'avg_duration_hours': sum([s.duration for s in sleeps]) / len(sleeps) / 60 if sleeps else 0
@@ -152,18 +198,18 @@ class PDFService:
             data = {
                 'weights': [w.to_dict() for w in weights],
                 'heart_rates': [hr.to_dict() for hr in heart_rates],
-                'activities': [a.to_dict() for a in activities],
+                'activities': activity_summary,
                 'sleeps': [s.to_dict() for s in sleeps],
                 'summary': {
-                    'weight': {'latest': weights[0].value if weights else 0},
+                    'weight': {'latest': weights[-1].value if weights else 0},
                     'heart_rate': {
                         'min': min([hr.value for hr in heart_rates]) if heart_rates else 0,
                         'max': max([hr.value for hr in heart_rates]) if heart_rates else 0,
                         'avg': sum([hr.value for hr in heart_rates]) / len(heart_rates) if heart_rates else 0
                     },
                     'activity': {
-                        'avg_steps': sum([a.value for a in activities]) / len(activities) if activities else 0,
-                        'total_steps': sum([a.value for a in activities]) if activities else 0
+                        'avg_steps': sum([a['steps'] for a in activity_summary]) / len(activity_summary) if activity_summary else 0,
+                        'total_steps': sum([a['steps'] for a in activity_summary]) if activity_summary else 0
                     },
                     'sleep': {
                         'avg_duration_hours': sum([s.duration for s in sleeps]) / len(sleeps) / 60 if sleeps else 0
@@ -180,12 +226,37 @@ class PDFService:
             HeartRate.user_id == user_id,
             HeartRate.timestamp >= share_link.date_range_start,
             HeartRate.timestamp <= share_link.date_range_end
-        ).order_by(HeartRate.timestamp.desc()).all()
+        ).order_by(HeartRate.timestamp.asc()).all()
+        
+        if not heart_rates:
+            return []
+            
+        # Group heart rates by day
+        from collections import defaultdict
+        daily_heart_rates = defaultdict(list)
+        
+        for hr in heart_rates:
+            date_key = hr.timestamp.strftime('%Y-%m-%d')
+            daily_heart_rates[date_key].append(hr)
+            
+        # Calculate daily stats
+        heart_rate_data = []
+        for date_key, hrs in sorted(daily_heart_rates.items()):
+            values = [hr.value for hr in hrs if hr.value is not None]
+            if values:
+                heart_rate_data.append({
+                    'date': date_key,
+                    'value': round(sum(values) / len(values)),  # average value
+                    'min': min(values),
+                    'max': max(values),
+                    'count': len(values),
+                    'unit': hrs[0].unit
+                })
         
         if share_link.privacy_level == 'overview':
-            return [{'date': hr.timestamp.strftime('%Y-%m-%d'), 'value': hr.value, 'unit': hr.unit} for hr in heart_rates[:14]]
+            return heart_rate_data[:14]
         else:  # complete
-            return [hr.to_dict() for hr in heart_rates]
+            return heart_rate_data
     
     @staticmethod
     def _get_activity_data(user_id, share_link):
@@ -193,12 +264,47 @@ class PDFService:
             Activity.user_id == user_id,
             Activity.timestamp >= share_link.date_range_start,
             Activity.timestamp <= share_link.date_range_end
-        ).order_by(Activity.timestamp.desc()).all()
+        ).order_by(Activity.timestamp.asc()).all()
+        
+        # Process activities to get daily summaries
+        daily_activities = {}
+        for activity in activities:
+            date_key = activity.timestamp.date()
+            if date_key not in daily_activities:
+                daily_activities[date_key] = {
+                    'date': date_key.strftime('%Y-%m-%d'),
+                    'steps': 0,
+                    'distance': 0,
+                    'calories': 0
+                }
+            
+            # Add steps from total_steps field if available
+            if activity.total_steps is not None:
+                daily_activities[date_key]['steps'] = max(daily_activities[date_key]['steps'], activity.total_steps)
+            
+            # Add distance from total_distance field if available
+            if activity.total_distance is not None:
+                daily_activities[date_key]['distance'] = max(daily_activities[date_key]['distance'], activity.total_distance)
+            
+            # Add calories from calories field if available
+            if activity.calories is not None:
+                daily_activities[date_key]['calories'] = max(daily_activities[date_key]['calories'], activity.calories)
+            
+            # Otherwise process by activity_type
+            elif activity.activity_type == 'steps' and activity.value is not None:
+                daily_activities[date_key]['steps'] += activity.value
+            elif activity.activity_type == 'distance' and activity.value is not None:
+                daily_activities[date_key]['distance'] += activity.value
+            elif activity.activity_type == 'calories' and activity.value is not None:
+                daily_activities[date_key]['calories'] += activity.value
+        
+        # Convert daily activity dict to list - sort by date ascending (small to large)
+        activity_summary = [v for k, v in sorted(daily_activities.items())]
         
         if share_link.privacy_level == 'overview':
-            return [{'date': a.timestamp.strftime('%Y-%m-%d'), 'steps': a.value} for a in activities[:14]]
+            return activity_summary[:14]
         else:  # complete
-            return [a.to_dict() for a in activities]
+            return activity_summary
     
     @staticmethod
     def _get_weight_data(user_id, share_link):
@@ -206,7 +312,7 @@ class PDFService:
             Weight.user_id == user_id,
             Weight.timestamp >= share_link.date_range_start,
             Weight.timestamp <= share_link.date_range_end
-        ).order_by(Weight.timestamp.desc()).all()
+        ).order_by(Weight.timestamp.asc()).all()
         
         if share_link.privacy_level == 'overview':
             return [{'date': w.timestamp.strftime('%Y-%m-%d'), 'value': w.value, 'unit': w.unit} for w in weights[:14]]
@@ -219,7 +325,7 @@ class PDFService:
             Sleep.user_id == user_id,
             Sleep.timestamp >= share_link.date_range_start,
             Sleep.timestamp <= share_link.date_range_end
-        ).order_by(Sleep.timestamp.desc()).all()
+        ).order_by(Sleep.timestamp.asc()).all()
         
         if share_link.privacy_level == 'overview':
             return [{'date': s.timestamp.strftime('%Y-%m-%d'), 'duration': s.duration / 60} for s in sleeps[:14]]
@@ -232,7 +338,7 @@ class PDFService:
             Goal.user_id == user_id,
             Goal.created_at >= share_link.date_range_start,
             Goal.created_at <= share_link.date_range_end
-        ).order_by(Goal.created_at.desc()).all()
+        ).order_by(Goal.created_at.asc()).all()
         
         return [g.to_dict() for g in goals]
     
@@ -242,7 +348,7 @@ class PDFService:
             UserAchievement.user_id == user_id,
             UserAchievement.earned_at >= share_link.date_range_start,
             UserAchievement.earned_at <= share_link.date_range_end
-        ).order_by(UserAchievement.earned_at.desc()).all()
+        ).order_by(UserAchievement.earned_at.asc()).all()
         
         achievements = []
         for ua in user_achievements:
@@ -252,4 +358,48 @@ class PDFService:
                 achievement_dict['earned_at'] = ua.earned_at.isoformat()
                 achievements.append(achievement_dict)
         
-        return achievements 
+        return achievements
+        
+    @staticmethod
+    def _get_finance_data(user_id, share_link):
+        """Get finance data for PDF"""
+        # Get all accounts
+        accounts = Account.query.filter_by(user_id=user_id).all()
+        
+        # Get transactions within date range
+        transactions = Transaction.query.filter(
+            Transaction.user_id == user_id,
+            Transaction.date >= share_link.date_range_start,
+            Transaction.date <= share_link.date_range_end
+        ).order_by(Transaction.date.asc()).all()
+        
+        # Get all categories
+        categories = Category.query.filter_by(user_id=user_id).all()
+        
+        return {
+            'accounts': [a.to_dict() for a in accounts],
+            'transactions': [t.to_dict() for t in transactions],
+            'categories': [c.to_dict() for c in categories]
+        }
+    
+    @staticmethod
+    def _get_education_data(user_id, share_link):
+        """Get education event data for PDF"""
+        # Get education events within date range
+        education_events = EducationEvent.query.filter(
+            EducationEvent.user_id == user_id,
+            EducationEvent.date >= share_link.date_range_start,
+            EducationEvent.date <= share_link.date_range_end
+        ).order_by(EducationEvent.date.asc()).all()
+        
+        return [
+            {
+                'id': e.id,
+                'title': e.title,
+                'description': e.description,
+                'date': e.date.strftime('%Y-%m-%d'),
+                'time': e.time.strftime('%H:%M') if e.time else None,
+                'notes': e.notes
+            }
+            for e in education_events
+        ] 

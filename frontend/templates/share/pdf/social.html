@@ -22,16 +22,17 @@
         <p><strong>Birth Date:</strong> {{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else 'Not specified' }}</p>
         <p><strong>Share Link:</strong> {{ share_link.share_token }}</p>
         <p><strong>Date Range:</strong> {{ share_link.date_range_start.strftime('%Y-%m-%d') }} to {{ share_link.date_range_end.strftime('%Y-%m-%d') }}</p>
+        <p><strong>Generated At:</strong> {{ generated_at }}</p>
     </div>
     <div class="section">
         <h2>Weight Records</h2>
-        {% if data.weights and data.weights|length > 0 %}
+        {% if data.weight and data.weight|length > 0 %}
         <table>
             <tr><th>Date</th><th>Weight (kg)</th></tr>
-            {% for w in data.weights %}
+            {% for w in data.weight %}
             <tr>
                 <td>{{ w.date }}</td>
-                <td>{{ w.weight }}</td>
+                <td>{{ w.value }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -41,15 +42,20 @@
     </div>
     <div class="section">
         <h2>Heart Rate Records</h2>
-        {% if data.heart_rates and data.heart_rates|length > 0 %}
+        {% if data.heartrate and data.heartrate|length > 0 %}
         <table>
-            <tr><th>Date</th><th>Min BPM</th><th>Max BPM</th><th>Avg BPM</th></tr>
-            {% for hr in data.heart_rates %}
+            <tr>
+                <th>Date</th>
+                <th>Average BPM</th>
+                <th>Min BPM</th>
+                <th>Max BPM</th>
+            </tr>
+            {% for hr in data.heartrate %}
             <tr>
                 <td>{{ hr.date }}</td>
-                <td>{{ hr.min_heart_rate }}</td>
-                <td>{{ hr.max_heart_rate }}</td>
-                <td>{{ hr.avg_heart_rate }}</td>
+                <td>{{ hr.value }}</td>
+                <td>{{ hr.min }}</td>
+                <td>{{ hr.max }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -59,10 +65,10 @@
     </div>
     <div class="section">
         <h2>Sleep Records</h2>
-        {% if data.sleeps and data.sleeps|length > 0 %}
+        {% if data.sleep and data.sleep|length > 0 %}
         <table>
             <tr><th>Date</th><th>Duration (hours)</th></tr>
-            {% for s in data.sleeps %}
+            {% for s in data.sleep %}
             <tr>
                 <td>{{ s.date }}</td>
                 <td>{{ s.duration }}</td>
@@ -75,13 +81,15 @@
     </div>
     <div class="section">
         <h2>Activity Records</h2>
-        {% if data.activities and data.activities|length > 0 %}
+        {% if data.activity and data.activity|length > 0 %}
         <table>
-            <tr><th>Date</th><th>Steps</th></tr>
-            {% for a in data.activities %}
+            <tr><th>Date</th><th>Steps</th><th>Distance (km)</th><th>Calories</th></tr>
+            {% for a in data.activity %}
             <tr>
                 <td>{{ a.date }}</td>
                 <td>{{ a.steps }}</td>
+                <td>{{ a.distance }}</td>
+                <td>{{ a.calories }}</td>
             </tr>
             {% endfor %}
         </table>
@@ -89,5 +97,65 @@
         <p>No activity data available.</p>
         {% endif %}
     </div>
+    
+    {% if 'finance' in modules %}
+    <div class="section">
+        <h2>Financial Records</h2>
+        {% if transactions and transactions|length > 0 %}
+        <h3>Recent Transactions</h3>
+        <table>
+            <tr><th>Date</th><th>Type</th><th>Amount</th><th>Category</th><th>Title</th></tr>
+            {% for tx in transactions %}
+            <tr>
+                <td>{{ tx.date.strftime('%Y-%m-%d') if tx.date else '' }}</td>
+                <td>{{ tx.type }}</td>
+                <td>{{ tx.amount }}</td>
+                <td>{{ tx.category.name if tx.category else '' }}</td>
+                <td>{{ tx.title }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        {% if accounts and accounts|length > 0 %}
+        <h3>Accounts</h3>
+        <table>
+            <tr><th>Name</th><th>Type</th><th>Balance</th><th>Currency</th></tr>
+            {% for account in accounts %}
+            <tr>
+                <td>{{ account.name }}</td>
+                <td>{{ account.type }}</td>
+                <td>{{ account.balance }}</td>
+                <td>{{ account.currency }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        
+        {% else %}
+        <p>No financial data available.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if 'education' in modules %}
+    <div class="section">
+        <h2>Education Events</h2>
+        {% if education_events and education_events|length > 0 %}
+        <table>
+            <tr><th>Date</th><th>Title</th><th>Description</th><th>Notes</th></tr>
+            {% for event in education_events %}
+            <tr>
+                <td>{{ event.date.strftime('%Y-%m-%d') if event.date else '' }}</td>
+                <td>{{ event.title }}</td>
+                <td>{{ event.description }}</td>
+                <td>{{ event.notes }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>No education event data available.</p>
+        {% endif %}
+    </div>
+    {% endif %}
 </body>
 </html> 

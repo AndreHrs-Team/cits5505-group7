@@ -24,6 +24,7 @@ try:
 except ImportError:
     HTML = None
 from app.utils.cache_utils import invalidate_shared_dashboard_cache
+from app.services.pdf_service import PDFService
 
 bp = Blueprint('share', __name__, url_prefix='/share')
 logger = logging.getLogger(__name__)
@@ -220,10 +221,18 @@ def view_shared_content(share_token):
     )
     if 'finance' in modules:
         context['accounts'] = Account.query.filter_by(user_id=share_link.user_id).all()
-        context['transactions'] = Transaction.query.filter_by(user_id=share_link.user_id).all()
+        context['transactions'] = Transaction.query.filter(
+            Transaction.user_id == share_link.user_id,
+            Transaction.date >= share_link.date_range_start,
+            Transaction.date <= share_link.date_range_end
+        ).order_by(Transaction.date.asc()).all()
         context['categories'] = Category.query.filter_by(user_id=share_link.user_id).all()
     if 'education' in modules:
-        context['education_events'] = EducationEvent.query.filter_by(user_id=share_link.user_id).all()
+        context['education_events'] = EducationEvent.query.filter(
+            EducationEvent.user_id == share_link.user_id,
+            EducationEvent.date >= share_link.date_range_start,
+            EducationEvent.date <= share_link.date_range_end
+        ).order_by(EducationEvent.date.asc()).all()
     template = f'share/{share_link.template_type}.html'
     return render_template(template, **context)
 
@@ -852,20 +861,47 @@ def export_pdf(token):
         return "WeasyPrint is not installed. Please install it to enable PDF export.", 500
     share_link = SharedLink.query.filter_by(share_token=token).first_or_404()
     user = User.query.get_or_404(share_link.user_id)
-    data = get_user_data_in_range(
-        user_id=share_link.user_id,
-        start_date=share_link.date_range_start,
-        end_date=share_link.date_range_end,
-        include_weight=share_link.show_weight,
-        include_heart_rate=share_link.show_heart_rate,
-        include_activity=share_link.show_activity,
-        include_sleep=share_link.show_sleep,
-        include_goals=share_link.show_goals,
-        include_achievements=share_link.show_achievements,
-        group_by='day'
-    )
+    
+    # Get health data using the PDFService
+    data = PDFService._get_shared_data(share_link)
+    
+    # Parse modules
+    modules = json.loads(share_link.modules) if share_link.modules else []
+    # Ensure finance/education are included if show_finance/show_education is True
+    if getattr(share_link, 'show_finance', False) and 'finance' not in modules:
+        modules.append('finance')
+    if getattr(share_link, 'show_education', False) and 'education' not in modules:
+        modules.append('education')
+    
+    # Prepare context for template
+    context = {
+        'user': user,
+        'share_link': share_link,
+        'data': data,
+        'modules': modules,
+        'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    # Add finance data if needed
+    if 'finance' in modules:
+        context['accounts'] = Account.query.filter_by(user_id=share_link.user_id).all()
+        context['transactions'] = Transaction.query.filter(
+            Transaction.user_id == share_link.user_id,
+            Transaction.date >= share_link.date_range_start,
+            Transaction.date <= share_link.date_range_end
+        ).order_by(Transaction.date.asc()).all()
+        context['categories'] = Category.query.filter_by(user_id=share_link.user_id).all()
+    
+    # Add education data if needed
+    if 'education' in modules:
+        context['education_events'] = EducationEvent.query.filter(
+            EducationEvent.user_id == share_link.user_id,
+            EducationEvent.date >= share_link.date_range_start,
+            EducationEvent.date <= share_link.date_range_end
+        ).order_by(EducationEvent.date.asc()).all()
+    
     # Render the PDF-specific template
-    html = render_template('share/pdf/social.html', user=user, share_link=share_link, data=data)
+    html = render_template(f'share/pdf/{share_link.template_type}.html', **context)
     pdf = HTML(string=html).write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'

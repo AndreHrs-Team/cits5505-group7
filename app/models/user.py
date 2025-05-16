@@ -108,13 +108,104 @@ class User(UserMixin, db.Model):
             return f"{self.first_name} {self.last_name}"
         return self.username
         
-    def export_data(self):
-        """Export user data as a dictionary"""
+    def export_data(self, start_date=None, end_date=None):
+        """Export user data as a dictionary
+        
+        Args:
+            start_date: Optional start date for filtering data
+            end_date: Optional end date for filtering data
+        
+        Returns:
+            Dictionary with user data
+        """
+        # Filter weights by date if date range is provided
+        weights_query = self.weights
+        if start_date:
+            weights_query = weights_query.filter(Weight.timestamp >= start_date)
+        if end_date:
+            weights_query = weights_query.filter(Weight.timestamp <= end_date)
+        
+        # Filter heart rates by date if date range is provided
+        heart_rates_query = self.heart_rates
+        if start_date:
+            heart_rates_query = heart_rates_query.filter(HeartRate.timestamp >= start_date)
+        if end_date:
+            heart_rates_query = heart_rates_query.filter(HeartRate.timestamp <= end_date)
+        
+        # Filter activities by date if date range is provided
+        activities_query = self.activities
+        if start_date:
+            activities_query = activities_query.filter(Activity.timestamp >= start_date)
+        if end_date:
+            activities_query = activities_query.filter(Activity.timestamp <= end_date)
+        
+        # Filter sleeps by date if date range is provided
+        sleeps_query = self.sleeps
+        if start_date:
+            sleeps_query = sleeps_query.filter(Sleep.timestamp >= start_date)
+        if end_date:
+            sleeps_query = sleeps_query.filter(Sleep.timestamp <= end_date)
+        
         data = {
             'profile': self.to_dict(),
-            'weights': [w.to_dict() for w in self.weights],
-            'heart_rates': [hr.to_dict() for hr in self.heart_rates],
-            'activities': [a.to_dict() for a in self.activities],
-            'sleeps': [s.to_dict() for s in self.sleeps],
+            'weights': [w.to_dict() for w in weights_query.all()],
+            'heart_rates': [hr.to_dict() for hr in heart_rates_query.all()],
+            'activities': [a.to_dict() for a in activities_query.all()],
+            'sleeps': [s.to_dict() for s in sleeps_query.all()],
         }
+        
+        # Add finance data if available
+        from app.models.finance.account import Account
+        from app.models.finance.transaction import Transaction
+        from app.models.finance.category import Category
+        
+        try:
+            accounts = Account.query.filter_by(user_id=self.id).all()
+            
+            # Get transactions within date range
+            transactions_query = Transaction.query.filter_by(user_id=self.id)
+            if start_date:
+                transactions_query = transactions_query.filter(Transaction.date >= start_date)
+            if end_date:
+                transactions_query = transactions_query.filter(Transaction.date <= end_date)
+            transactions = transactions_query.all()
+            
+            categories = Category.query.filter_by(user_id=self.id).all()
+            
+            data['finance'] = {
+                'accounts': [a.to_dict() for a in accounts],
+                'transactions': [t.to_dict() for t in transactions],
+                'categories': [c.to_dict() for c in categories]
+            }
+        except Exception:
+            # Finance module might not be available
+            pass
+        
+        # Add education data if available
+        from app.models.education_event import EducationEvent
+        
+        try:
+            # Get education events within date range
+            education_query = EducationEvent.query.filter_by(user_id=self.id)
+            if start_date:
+                education_query = education_query.filter(EducationEvent.date >= start_date)
+            if end_date:
+                education_query = education_query.filter(EducationEvent.date <= end_date)
+            education_events = education_query.all()
+            
+            data['education'] = [
+                {
+                    'id': e.id,
+                    'title': e.title,
+                    'description': e.description,
+                    'date': e.date.strftime('%Y-%m-%d') if e.date else None,
+                    'time': e.time.strftime('%H:%M') if e.time else None,
+                    'notes': e.notes
+                }
+                for e in education_events
+            ]
+        except Exception:
+            # Education module might not be available
+            pass
+        
         return data

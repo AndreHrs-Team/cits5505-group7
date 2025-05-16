@@ -68,4 +68,11 @@ class AccountSettingsForm(FlaskForm):
 class ExportConsentForm(FlaskForm):
     """Form for data export consent"""
     confirm_export = BooleanField('I consent to exporting my personal health data', validators=[DataRequired(message='You must consent to export your data')])
-    submit = SubmitField('Export Data') 
+    start_date = DateField('Start Date (Optional)', validators=[Optional()], format='%Y-%m-%d')
+    end_date = DateField('End Date (Optional)', validators=[Optional()], format='%Y-%m-%d')
+    submit = SubmitField('Export Data')
+    
+    def validate_end_date(self, field):
+        """Validate that end date is after start date if both are provided"""
+        if self.start_date.data and field.data and field.data < self.start_date.data:
+            raise ValidationError('End date must be after start date') 
