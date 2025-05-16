@@ -2,21 +2,80 @@
 {% extends "base.html" %}
 
 {% block content%}
+<!-- CSS styles to improve text contrast in both light and dark modes -->
+<style>
+  /* Light mode - course time styling */
+  .card li {
+    color: #333; /* Dark text for better readability */
+  }
+  
+  /* Target the time portion specifically */
+  .card li::first-letter,
+  .card li::first-line {
+    color: #00796b; /* Darker teal for better contrast in light mode */
+    font-weight: 500;
+  }
+  
+  /* Dark mode specific adjustments */
+  @media (prefers-color-scheme: dark) {
+    .card li {
+      color: #e0e0e0; /* Light text for dark mode */
+    }
+    
+    .card li::first-letter,
+    .card li::first-line {
+      color: #4db6ac; /* Lighter teal for dark mode */
+    }
+  }
+</style>
+
 <div class="container mt-4">
   <p>Got your .ics subscription from CAS? Import it now:</p>
-  <form action="{{ url_for('education.import_ics') }}" method="POST" enctype="multipart/form-data" class="mb-4">
-    <input type="file" name="ics_file" hidden id="icsFileInput" onchange="this.form.submit()" />
-    <button type="button" class="btn btn-primary" onclick="document.getElementById('icsFileInput').click()">
-      Import cas .ics
-    </button>
-  </form>
+  
+  <ul class="nav nav-tabs mb-3" id="importTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-import" type="button" role="tab" aria-controls="file-import" aria-selected="true">
+        File Upload
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-import" type="button" role="tab" aria-controls="url-import" aria-selected="false">
+        URL Import
+      </button>
+    </li>
+  </ul>
+  
+  <div class="tab-content mb-4" id="importTabsContent">
+    <!-- File Upload Tab -->
+    <div class="tab-pane fade show active" id="file-import" role="tabpanel" aria-labelledby="file-tab">
+      <form action="{{ url_for('education.import_ics') }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="ics_file" hidden id="icsFileInput" onchange="this.form.submit()" />
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('icsFileInput').click()">
+          Import cas .ics from file
+        </button>
+      </form>
+    </div>
+    
+    <!-- URL Import Tab -->
+    <div class="tab-pane fade" id="url-import" role="tabpanel" aria-labelledby="url-tab">
+      <form action="{{ url_for('education.import_ics') }}" method="POST">
+        <div class="input-group">
+          <input type="url" name="ics_url" class="form-control" placeholder="Enter ICS URL" required>
+          <input type="hidden" name="import_type" value="url">
+          <button type="submit" class="btn btn-primary">
+            Import cas .ics from URL
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="row">
-    <!-- This Week’s Schedule -->
+    <!-- This Week's Schedule -->
     <div class="col-md-6">
       <div class="card p-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">This Week’s Schedule</h5>
+          <h5 class="mb-0">This Week's Schedule</h5>
           <a href="{{ url_for('education.calendar') }}" class="btn btn-outline-primary">
             <i class="fa-regular fa-calendar"></i> View Calendar
           </a>
@@ -114,27 +173,25 @@
     }
 
     // upcoming_events passed from Flask view
-    const events = {{ upcoming_events| tojson
-  }};
+    const events = {{ upcoming_events| tojson }};
 
-
-  events.forEach(ev => {
-    const evDate = new Date(ev.start);
-    // calculate trigger time: one hour before class
-    const triggerTime = evDate.getTime() - 60 * 60 * 1000;
-    const now = Date.now();
-    const delay = triggerTime - now;
-    if (delay > 0) {
-      setTimeout(() => {
-        const message = `Upcoming class: ${ev.title} at ${evDate.toLocaleTimeString()}`;
-        if (Notification.permission === 'granted') {
-          new Notification('Class Reminder', { body: message });
-        } else {
-          alert(message);
-        }
-      }, delay);
-    }
-  });
+    events.forEach(ev => {
+      const evDate = new Date(ev.start);
+      // calculate trigger time: one hour before class
+      const triggerTime = evDate.getTime() - 60 * 60 * 1000;
+      const now = Date.now();
+      const delay = triggerTime - now;
+      if (delay > 0) {
+        setTimeout(() => {
+          const message = `Upcoming class: ${ev.title} at ${evDate.toLocaleTimeString()}`;
+          if (Notification.permission === 'granted') {
+            new Notification('Class Reminder', { body: message });
+          } else {
+            alert(message);
+          }
+        }, delay);
+      }
     });
+  });
 </script>
 {% endblock %}
