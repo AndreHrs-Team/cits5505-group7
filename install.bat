@@ -1,16 +1,17 @@
+@echo off
 echo [Install] Checking if virtual environment exists...
+
 if not exist ".\application-env\Scripts\activate.bat" (
     echo [Install] Virtual environment not found...
     echo [Install] Creating virtual environment...
-    python3 -m venv application-env
+    python -m venv application-env
 
     echo [Install] Activating virtual environment...
-    call application-env\Scripts\activate
+    call application-env\Scripts\activate.bat
 
     echo [Install] Installing dependencies...
     pip install -r requirements.txt
 ) else (
     echo [Install] Virtual environment found...
-    call .\application-env\Scripts\activate.bat
+    call application-env\Scripts\activate.bat
 )
-
