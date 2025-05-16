@@ -45,6 +45,16 @@ def create_app(config_name=None):
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
 
+    # Add custom Jinja filters
+    @app.template_filter('format_decimal')
+    def format_decimal(value, decimal_places=1):
+        if value is None:
+            return "0.0"
+        try:
+            return f"{float(value):.{decimal_places}f}"
+        except (ValueError, TypeError):
+            return str(value)
+
     # User loader
     from app.models import User
 

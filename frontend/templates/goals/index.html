@@ -34,19 +34,37 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-md-8 text-start">
-                                            <h6>Weekly Steps Change</h6>
-                                            {% if steps_change > 0 %}
-                                                <div class="text-success">
-                                                    <i class="fas fa-arrow-up"></i> +{{ steps_change|round(1) }}% from last week
-                                                </div>
-                                            {% elif steps_change < 0 %}
-                                                <div class="text-danger">
-                                                    <i class="fas fa-arrow-down"></i> {{ steps_change|round(1) }}% from last week
-                                                </div>
+                                            {% if today_steps > 0 %}
+                                                <h6>Today's Steps</h6>
+                                                <div class="fs-4">{{ today_steps|format_decimal(0) }} steps</div>
+                                                <div class="text-muted small">Today's total</div>
+                                            {% elif latest_activity and latest_activity.total_steps %}
+                                                <h6>Current Steps</h6>
+                                                <div class="fs-4">{{ latest_activity.total_steps|format_decimal(0) }} steps</div>
+                                                <div class="text-muted small">Last updated: {{ latest_activity.timestamp.strftime('%Y-%m-%d') }}</div>
+                                            {% elif latest_activity and latest_activity.activity_type == 'steps' and latest_activity.value %}
+                                                <h6>Current Steps</h6>
+                                                <div class="fs-4">{{ latest_activity.value|format_decimal(0) }} steps</div>
+                                                <div class="text-muted small">Last updated: {{ latest_activity.timestamp.strftime('%Y-%m-%d') }}</div>
+                                            {% elif this_week_total > 0 %}
+                                                <h6>Weekly Steps</h6>
+                                                <div class="fs-4">{{ this_week_total|format_decimal(0) }} steps</div>
+                                                <div class="text-muted small">This week's total</div>
                                             {% else %}
-                                                <div class="text-muted">
-                                                    <i class="fas fa-minus"></i> No change from last week
-                                                </div>
+                                                <h6>Weekly Steps Change</h6>
+                                                {% if steps_change > 0 %}
+                                                    <div class="text-success">
+                                                        <i class="fas fa-arrow-up"></i> +{{ steps_change|round(1) }}% from last week
+                                                    </div>
+                                                {% elif steps_change < 0 %}
+                                                    <div class="text-danger">
+                                                        <i class="fas fa-arrow-down"></i> {{ steps_change|round(1) }}% from last week
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-minus"></i> No change from last week
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 text-start">
@@ -69,7 +87,7 @@
                                         <div class="col-md-8 text-start">
                                             {% if latest_weight %}
                                                 <h6>Current Weight</h6>
-                                                <div class="fs-4">{{ latest_weight.value }} {{ latest_weight.unit }}</div>
+                                                <div class="fs-4">{{ latest_weight.value|format_decimal(1) }} {{ latest_weight.unit }}</div>
                                                 <div class="text-muted small">Last updated: {{ latest_weight.timestamp.strftime('%Y-%m-%d') }}</div>
                                             {% else %}
                                                 <div class="text-muted">No weight data available</div>
@@ -93,19 +111,25 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-md-8 text-start">
-                                            <h6>Sleep Quality Change</h6>
-                                            {% if sleep_change > 0 %}
-                                                <div class="text-success">
-                                                    <i class="fas fa-arrow-up"></i> +{{ sleep_change|round(1) }}% better sleep quality
-                                                </div>
-                                            {% elif sleep_change < 0 %}
-                                                <div class="text-danger">
-                                                    <i class="fas fa-arrow-down"></i> {{ sleep_change|round(1) }}% worse sleep quality
-                                                </div>
+                                            {% if latest_sleep %}
+                                                <h6>Current Sleep Duration</h6>
+                                                <div class="fs-4">{{ (latest_sleep.duration / 60)|format_decimal(1) }} hours</div>
+                                                <div class="text-muted small">Last updated: {{ latest_sleep.timestamp.strftime('%Y-%m-%d') }}</div>
                                             {% else %}
-                                                <div class="text-muted">
-                                                    <i class="fas fa-minus"></i> No change in sleep quality
-                                                </div>
+                                                <h6>Sleep Quality Change</h6>
+                                                {% if sleep_change > 0 %}
+                                                    <div class="text-success">
+                                                        <i class="fas fa-arrow-up"></i> +{{ sleep_change|round(1) }}% better sleep quality
+                                                    </div>
+                                                {% elif sleep_change < 0 %}
+                                                    <div class="text-danger">
+                                                        <i class="fas fa-arrow-down"></i> {{ sleep_change|round(1) }}% worse sleep quality
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-minus"></i> No change in sleep quality
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 text-start">
@@ -126,19 +150,25 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-md-8 text-start">
-                                            <h6>Heart Rate Change</h6>
-                                            {% if heart_rate_change > 0 %}
-                                                <div class="text-danger">
-                                                    <i class="fas fa-arrow-up"></i> +{{ heart_rate_change|round(1) }}% increased resting rate
-                                                </div>
-                                            {% elif heart_rate_change < 0 %}
-                                                <div class="text-success">
-                                                    <i class="fas fa-arrow-down"></i> {{ heart_rate_change|round(1) }}% decreased resting rate
-                                                </div>
+                                            {% if latest_heart_rate %}
+                                                <h6>Current Heart Rate</h6>
+                                                <div class="fs-4">{{ latest_heart_rate.value|format_decimal(0) }} bpm</div>
+                                                <div class="text-muted small">Last updated: {{ latest_heart_rate.timestamp.strftime('%Y-%m-%d') }}</div>
                                             {% else %}
-                                                <div class="text-muted">
-                                                    <i class="fas fa-minus"></i> No change in heart rate
-                                                </div>
+                                                <h6>Heart Rate Change</h6>
+                                                {% if heart_rate_change > 0 %}
+                                                    <div class="text-danger">
+                                                        <i class="fas fa-arrow-up"></i> +{{ heart_rate_change|round(1) }}% increased resting rate
+                                                    </div>
+                                                {% elif heart_rate_change < 0 %}
+                                                    <div class="text-success">
+                                                        <i class="fas fa-arrow-down"></i> {{ heart_rate_change|round(1) }}% decreased resting rate
+                                                    </div>
+                                                {% else %}
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-minus"></i> No change in heart rate
+                                                    </div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4 text-start">
@@ -185,7 +215,7 @@
                                     </div>
                                     <div class="goal-details">
                                         <div><strong>Timeframe:</strong> {{ goal.timeframe|capitalize }}</div>
-                                        <div><strong>Current:</strong> {{ goal.current_value }} {{ goal.unit }}</div>
+                                        <div><strong>Current:</strong> {{ goal.current_value|format_decimal(1) }} {{ goal.unit }}</div>
                                     </div>
                                     <div class="goal-progress">
                                         <div class="progress-bar" role="progressbar" 
@@ -252,7 +282,7 @@
                                     </div>
                                     <div class="goal-details">
                                         <div><strong>Timeframe:</strong> {{ goal.timeframe|capitalize }}</div>
-                                        <div><strong>Result:</strong> {{ goal.current_value }} {{ goal.unit }}</div>
+                                        <div><strong>Result:</strong> {{ goal.current_value|format_decimal(1) }} {{ goal.unit }}</div>
                                     </div>
                                     <div class="goal-progress">
                                         <div class="progress-bar" role="progressbar" 

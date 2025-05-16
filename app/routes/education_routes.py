@@ -1,4 +1,5 @@
 import os
+import requests
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
@@ -36,24 +37,54 @@ def is_club(ev):
 @login_required
 def import_ics():
     """
-    Import a .ics file and expand RRULEs into individual DB rows.
+    Import a .ics file from either an uploaded file or a URL and expand RRULEs into individual DB rows.
     Old schedule entries for this user will be deleted before importing.
     """
-    ics_file = request.files.get('ics_file')
-    if not ics_file or not ics_file.filename.lower().endswith('.ics'):
-        flash("Please upload a valid .ics file.", "warning")
+    import_type = request.form.get('import_type')
+    cal_data = None
+    
+    if import_type == 'url':
+        # Import from URL
+        ics_url = request.form.get('ics_url')
+        if not ics_url:
+            flash("Please provide a valid ICS URL.", "warning")
+            return redirect(url_for('education.schedule'))
+            
+        try:
+            response = requests.get(ics_url)
+            if response.status_code != 200:
+                flash(f"Failed to download ICS file: HTTP {response.status_code}", "danger")
+                return redirect(url_for('education.schedule'))
+                
+            cal_data = response.content
+            
+        except Exception as e:
+            flash(f"Error downloading ICS file: {str(e)}", "danger")
+            return redirect(url_for('education.schedule'))
+    else:
+        # Import from uploaded file
+        ics_file = request.files.get('ics_file')
+        if not ics_file or not ics_file.filename.lower().endswith('.ics'):
+            flash("Please upload a valid .ics file.", "warning")
+            return redirect(url_for('education.schedule'))
+
+        filepath = os.path.join(
+            current_app.instance_path,
+            'uploads',
+            f"{current_user.id}_{ics_file.filename}"
+        )
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        ics_file.save(filepath)
+
+        with open(filepath, 'rb') as f:
+            cal_data = f.read()
+
+    # Parse the calendar data
+    try:
+        cal = Calendar.from_ical(cal_data)
+    except Exception as e:
+        flash(f"Failed to parse ICS data: {str(e)}", "danger")
         return redirect(url_for('education.schedule'))
-
-    filepath = os.path.join(
-        current_app.instance_path,
-        'uploads',
-        f"{current_user.id}_{ics_file.filename}"
-    )
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    ics_file.save(filepath)
-
-    with open(filepath, 'rb') as f:
-        cal = Calendar.from_ical(f.read())
 
     # delete old entries
     EducationEvent.query.filter_by(user_id=current_user.id).delete()
