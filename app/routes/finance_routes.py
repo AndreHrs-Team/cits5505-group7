@@ -72,5 +72,5 @@ def delete_category(category_id):
 @bp.route('/insight')
 @login_required
 def render_finance_insight_page():
-    return render_template('finance/finance_insight.html.j2')
+    return TransactionController.handle_insight_page(current_user)
 
