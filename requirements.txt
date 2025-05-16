@@ -1,62 +1,89 @@
-# Core Web Framework
-Flask==2.3.3
-Werkzeug==2.3.7
-Jinja2==3.1.2
-itsdangerous==2.1.2
-click==8.1.7
-blinker==1.9.0
-MarkupSafe==3.0.2
-
-# Flask Extensions
-Flask-SQLAlchemy==3.1.1
-Flask-Login==0.6.2
-Flask-Migrate==4.0.5
-Flask-WTF==1.2.1
-Flask-Caching==2.3.1
-Flask-Mail==0.9.1
-Flask-Cors==4.0.0
-WTForms==3.2.1
-
-# Database
-SQLAlchemy==2.0.23
 alembic==1.12.1
-psycopg2-binary==2.9.10
-
-# Authentication & Security
 argon2-cffi==23.1.0
-PyJWT==2.10.1
+argon2-cffi-bindings==21.2.0
+attrs==25.3.0
+beautifulsoup4==4.13.3
+black==23.9.1
+blinker==1.9.0
+Brotli==1.1.0
+cachelib==0.13.0
+certifi==2025.4.26
+cffi==1.17.1
+charset-normalizer==3.4.2
+click==8.1.7
+colorama==0.4.6
+contourpy==1.3.2
+coverage==7.8.0
+cssselect2==0.8.0
+cycler==0.12.1
+dnspython==2.7.0
 email-validator==2.1.0.post1
-
-# Date & Time
-python-dateutil==2.8.2
-pytz==2023.3.post1
-
-# Environment & Configuration
-python-dotenv==1.0.0
-
-# Data Processing & Analysis
-pandas==2.1.1
-numpy==1.26.0
+flake8==6.1.0
+Flask==2.3.3
+Flask-Caching==2.3.1
+Flask-Cors==4.0.0
+Flask-Login==0.6.2
+Flask-Mail==0.9.1
+Flask-Migrate==4.0.5
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+fonttools==4.58.0
+greenlet==3.2.1
+gunicorn==21.2.0
+h11==0.16.0
+icalendar==6.3.0
+idna==3.10
+iniconfig==2.1.0
+itsdangerous==2.1.2
+Jinja2==3.1.2
+kiwisolver==1.4.8
+Mako==1.3.10
+MarkupSafe==3.0.2
 matplotlib==3.8.0
-seaborn==0.13.0
-
-# Testing
+mccabe==0.7.0
+mypy_extensions==1.1.0
+numpy==1.26.0
+outcome==1.3.0.post0
+packaging==25.0
+pandas==2.1.1
+pathspec==0.12.1
+pillow==11.2.1
+platformdirs==4.3.8
+pluggy==1.6.0
+psycopg2-binary==2.9.10
+pycodestyle==2.11.1
+pycparser==2.22
+pydyf==0.11.0
+pyflakes==3.1.0
+PyJWT==2.10.1
+pyparsing==3.2.3
+pyphen==0.17.2
+PySocks==1.7.1
 pytest==7.4.2
 pytest-cov==4.1.0
-
-# Utilities
+python-dateutil==2.8.2
+python-dotenv==1.0.0
+pytz==2023.3.post1
 requests==2.32.3
-beautifulsoup4==4.13.3
-
-# Production
-gunicorn==21.2.0
-
-# Development
-black==23.9.1
-flake8==6.1.0
-
-# PDF Generation
-WeasyPrint>=60
-
-# calendar package
-icalendar>=4.0.0
+seaborn==0.13.0
+selenium==4.32.0
+six==1.17.0
+sniffio==1.3.1
+sortedcontainers==2.4.0
+soupsieve==2.7
+SQLAlchemy==2.0.23
+tinycss2==1.4.0
+tinyhtml5==2.0.0
+trio==0.30.0
+trio-websocket==0.12.2
+typing_extensions==4.13.2
+tzdata==2025.2
+urllib3==2.4.0
+weasyprint==65.1
+webdriver-manager==4.0.2
+webencodings==0.5.1
+websocket-client==1.8.0
+Werkzeug==2.3.7
+wsproto==1.2.0
+WTForms==3.2.1
+zopfli==0.2.3.post1
