@@ -32,7 +32,37 @@
                         <li>Sleep records</li>
                         <li>Heart rate measurements</li>
                         <li>Goals and achievements</li>
+                        <li>Finance data (if available)</li>
+                        <li>Education data (if available)</li>
                     </ul>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Optional Date Range Filter</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="dateRangeForm">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="mb-3">
+                                            <label for="start_date" class="form-label">Start Date</label>
+                                            <input type="date" id="start_date" name="start_date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="mb-3">
+                                            <label for="end_date" class="form-label">End Date</label>
+                                            <input type="date" id="end_date" name="end_date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" id="clearDates" class="btn btn-outline-secondary mb-3">Clear</button>
+                                    </div>
+                                </div>
+                                <small class="text-muted">If no date range is specified, all your data will be exported.</small>
+                            </form>
+                        </div>
+                    </div>
                     
                     <div class="row mb-4">
                         <div class="col-md-4">
@@ -41,7 +71,7 @@
                                     <i class="fas fa-file-csv fa-3x mb-3 text-primary"></i>
                                     <h5>CSV Format</h5>
                                     <p class="small">Comma-separated values for spreadsheet programs</p>
-                                    <a href="{{ url_for('user.export_data_format', format='csv') }}" class="btn btn-outline-primary">Download CSV</a>
+                                    <button class="btn btn-outline-primary export-btn" data-format="csv">Download CSV</button>
                                 </div>
                             </div>
                         </div>
@@ -51,7 +81,7 @@
                                     <i class="fas fa-file-code fa-3x mb-3 text-primary"></i>
                                     <h5>JSON Format</h5>
                                     <p class="small">Structured data format for developers</p>
-                                    <a href="{{ url_for('user.export_data_format', format='json') }}" class="btn btn-outline-primary">Download JSON</a>
+                                    <button class="btn btn-outline-primary export-btn" data-format="json">Download JSON</button>
                                 </div>
                             </div>
                         </div>
@@ -61,7 +91,7 @@
                                     <i class="fas fa-file-pdf fa-3x mb-3 text-primary"></i>
                                     <h5>PDF Report</h5>
                                     <p class="small">Formatted report with charts and analysis</p>
-                                    <a href="{{ url_for('user.export_data_format', format='pdf') }}" class="btn btn-outline-primary">Download PDF</a>
+                                    <button class="btn btn-outline-primary export-btn" data-format="pdf">Download PDF</button>
                                 </div>
                             </div>
                         </div>
@@ -76,4 +106,38 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle export buttons
+        document.querySelectorAll('.export-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const format = this.getAttribute('data-format');
+                const startDate = document.getElementById('start_date').value;
+                const endDate = document.getElementById('end_date').value;
+                
+                let url = "{{ url_for('user.export_data_format', format='FORMAT') }}".replace('FORMAT', format);
+                
+                // Add date parameters if they exist
+                if (startDate) {
+                    url += (url.includes('?') ? '&' : '?') + 'start_date=' + startDate;
+                }
+                if (endDate) {
+                    url += (url.includes('?') ? '&' : '?') + 'end_date=' + endDate;
+                }
+                
+                // Navigate to the export URL
+                window.location.href = url;
+            });
+        });
+        
+        // Clear date inputs
+        document.getElementById('clearDates').addEventListener('click', function() {
+            document.getElementById('start_date').value = '';
+            document.getElementById('end_date').value = '';
+        });
+    });
+</script>
 {% endblock %} 

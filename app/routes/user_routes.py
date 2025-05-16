@@ -6,6 +6,8 @@ from app.models.user import User
 from app.utils.export import export_data_to_csv
 from datetime import datetime
 import logging
+import io
+import json
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 logger = logging.getLogger(__name__)
@@ -104,7 +106,11 @@ def export_data():
     
     if form.validate_on_submit() and form.confirm_export.data:
         try:
-            memory_file = export_data_to_csv(current_user)
+            # Get date range if provided
+            start_date = form.start_date.data if hasattr(form, 'start_date') and form.start_date.data else None
+            end_date = form.end_date.data if hasattr(form, 'end_date') and form.end_date.data else None
+            
+            memory_file = export_data_to_csv(current_user, start_date, end_date)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             return send_file(
                 memory_file,
@@ -117,4 +123,49 @@ def export_data():
             flash('An error occurred while exporting your data.', 'danger')
             return redirect(url_for('user.profile'))
     
-    return render_template('user/export_consent.html', form=form, title='Export Data') 
+    return render_template('user/export_consent.html', form=form, title='Export Data')
+
+@bp.route('/export_data/<format>', methods=['GET'])
+@login_required
+def export_data_format(format):
+    """Export user data in specific format"""
+    try:
+        # Get date range from query parameters if provided
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+        
+        if format == 'csv':
+            memory_file = export_data_to_csv(current_user, start_date, end_date)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            return send_file(
+                memory_file,
+                download_name=f'healthtrack_data_{current_user.username}_{timestamp}.zip',
+                as_attachment=True,
+                mimetype='application/zip'
+            )
+        elif format == 'json':
+            # Export as JSON
+            data = current_user.export_data(start_date, end_date)
+            memory_file = io.BytesIO()
+            memory_file.write(json.dumps(data, indent=2).encode('utf-8'))
+            memory_file.seek(0)
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            return send_file(
+                memory_file,
+                download_name=f'healthtrack_data_{current_user.username}_{timestamp}.json',
+                as_attachment=True,
+                mimetype='application/json'
+            )
+        elif format == 'pdf':
+            # Redirect to generate PDF report
+            return redirect(url_for('user.profile'))
+        else:
+            flash('Unsupported export format.', 'danger')
+            return redirect(url_for('user.export_data'))
+    except Exception as e:
+        logger.error(f"Error exporting data in format {format}: {str(e)}", exc_info=True)
+        flash('An error occurred while exporting your data.', 'danger')
+        return redirect(url_for('user.export_data')) 
