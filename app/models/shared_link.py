@@ -220,7 +220,9 @@ class SharedLink(db.Model):
             'template_type': self.template_type,
             'personal_message': self.personal_message,
             'theme': self.theme,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'access_count': self.access_count,
+            'last_accessed': self.last_accessed.isoformat() if self.last_accessed else None
         }
     
     def update_access_stats(self):
