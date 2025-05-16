@@ -140,6 +140,12 @@ def from_progress():
         
         if category:
             form.category.data = category
+        
+        # Convert sleep data from minutes to hours if needed
+        if category == 'sleep' and baseline and suggested_target:
+            baseline = float(baseline) / 60
+            suggested_target = float(suggested_target) / 60
+        
         if suggested_target:
             form.target_value.data = float(suggested_target)
         
@@ -160,6 +166,9 @@ def from_progress():
             progress_baseline = float(request.form.get('baseline', 0))
         elif request.form.get('baseline'):
             progress_baseline = float(request.form.get('baseline'))
+            # Convert baseline back to minutes if it's sleep data
+            if form.category.data == 'sleep' and form.unit.data == 'hours':
+                progress_baseline = progress_baseline * 60
         
         # Create goal
         goal = GoalService.create_goal(
@@ -180,9 +189,21 @@ def from_progress():
         flash('Goal created from progress data!', 'success')
         return redirect(url_for('goals.index'))
     
+    # Prepare baseline value for display
+    display_baseline = request.args.get('baseline')
+    category = request.args.get('category')
+    
+    # Format the baseline value if it's for sleep (convert minutes to hours)
+    if display_baseline and category == 'sleep':
+        try:
+            display_baseline = float(display_baseline) / 60
+            display_baseline = round(display_baseline, 1)
+        except (ValueError, TypeError):
+            pass
+    
     return render_template('goals/create_from_progress.html', 
                            form=form, 
-                           baseline=request.args.get('baseline'))
+                           baseline=display_baseline)
 
 @bp.route('/update_progress/<int:goal_id>', methods=['POST'])
 @login_required
@@ -221,32 +242,52 @@ def steps_progress():
     days = 30
     steps_data = []
     
+    # Check if user has any activity data
+    has_activities = Activity.query.filter_by(user_id=current_user.id).count() > 0
+    
     for i in range(days):
         date = datetime.utcnow().date() - timedelta(days=i)
         start_of_day = datetime.combine(date, datetime.min.time())
         end_of_day = datetime.combine(date, datetime.max.time())
         
+        # Get activities for this day
         day_activities = Activity.query.filter(
             Activity.user_id == current_user.id,
             Activity.timestamp >= start_of_day,
             Activity.timestamp <= end_of_day
         ).all()
         
-        day_steps = sum(activity.total_steps or 0 for activity in day_activities)
+        # Calculate total steps for this day
+        day_steps = 0
+        for activity in day_activities:
+            if activity.total_steps is not None and activity.total_steps > 0:
+                day_steps += activity.total_steps
+            elif activity.activity_type == 'steps' and activity.value is not None:
+                day_steps += int(activity.value)
         
         steps_data.append({
             'date': date.strftime('%Y-%m-%d'),
             'steps': day_steps
         })
     
-    # Calculate suggested goal
-    average_steps = sum(day['steps'] for day in steps_data) / len(steps_data) if steps_data else 0
-    suggested_goal = round(average_steps * 1.1)  # 10% increase
+    # Calculate suggested goal if there's data
+    total_steps = sum(day['steps'] for day in steps_data)
+    has_step_data = total_steps > 0
+    
+    if has_step_data:
+        non_zero_days = [d['steps'] for d in steps_data if d['steps'] > 0]
+        average_steps = sum(non_zero_days) / len(non_zero_days) if non_zero_days else 0
+        suggested_goal = round(average_steps * 1.1)  # 10% increase
+    else:
+        average_steps = 0
+        suggested_goal = 10000  # Default suggestion
     
     return render_template('goals/progress/steps.html',
                           steps_data=steps_data,
                           average_steps=average_steps,
-                          suggested_goal=suggested_goal)
+                          suggested_goal=suggested_goal,
+                          has_activities=has_activities,
+                          has_step_data=has_step_data)
 
 @bp.route('/progress/weight')
 @login_required

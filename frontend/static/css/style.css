@@ -1200,11 +1200,23 @@ a:hover {
 }
 
 .goal-progress {
-    height: 10px;
+    height: 25px;
     border-radius: 5px;
     margin-bottom: 1rem;
     overflow: hidden;
     background-color: rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goal-progress .progress-text {
+    position: absolute;
+    z-index: 2;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .goal-card.steps .goal-progress .progress-bar {
@@ -1957,4 +1969,26 @@ body span.badge.bg-bronze {
     color: white !important;
     font-weight: 700 !important;
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Add styling for form labels in dark mode */
+.dark-mode label:not(.form-check-label),
+.dark-mode .form-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.dark-mode .text-muted,
+.dark-mode .form-text {
+    color: var(--text-secondary) !important;
+}
+
+/* Improve visibility of admin action buttons in dark mode */
+.dark-mode .table .btn-sm.btn-primary,
+.dark-mode .table .btn-sm.btn-info {
+    background-color: #00d6e3 !important; /* Brighter turquoise */
+    border-color: #00d6e3 !important;
+    color: #000000 !important; /* Black text */
+    font-weight: 700 !important; /* Bold text */
+    text-shadow: 0 0 2px rgba(255, 255, 255, 0.5) !important; /* White glow around text */
 } 

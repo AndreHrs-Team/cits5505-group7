@@ -594,6 +594,25 @@ def create_share():
                 'show_education': form.show_education.data
             }
             
+            # Build modules list based on checkbox selections
+            modules_list = ['dashboard']  # Dashboard is always included
+            if form.show_weight.data:
+                modules_list.append('weight')
+            if form.show_heart_rate.data:
+                modules_list.append('heartrate')
+            if form.show_activity.data:
+                modules_list.append('activity')
+            if form.show_sleep.data:
+                modules_list.append('sleep')
+            if form.show_goals.data:
+                modules_list.append('goals')
+            if form.show_achievements.data:
+                modules_list.append('achievements')
+            if form.show_finance.data:
+                modules_list.append('finance')
+            if form.show_education.data:
+                modules_list.append('education')
+            
             # Create the share link
             share_link = SharedLink.create_shared_link(
                 user_id=current_user.id,
@@ -604,7 +623,8 @@ def create_share():
                 expiry_days=expiry_days,
                 privacy_settings=privacy_settings,
                 password=password,
-                one_time_password=False  # 先设置为False，然后在需要时通过set_password设置
+                one_time_password=False,  # 先设置为False，然后在需要时通过set_password设置
+                modules=json.dumps(modules_list)
             )
             
             # If one-time password was generated, get it and show it to the user
@@ -702,6 +722,28 @@ def edit_share(share_id):
                     share_link.show_finance = form.show_finance.data
                     share_link.show_education = form.show_education.data
                     
+                    # Build updated modules list based on selected options
+                    modules_list = ['dashboard']  # Dashboard is always included
+                    if form.show_weight.data:
+                        modules_list.append('weight')
+                    if form.show_heart_rate.data:
+                        modules_list.append('heartrate')
+                    if form.show_activity.data:
+                        modules_list.append('activity')
+                    if form.show_sleep.data:
+                        modules_list.append('sleep')
+                    if form.show_goals.data:
+                        modules_list.append('goals')
+                    if form.show_achievements.data:
+                        modules_list.append('achievements')
+                    if form.show_finance.data:
+                        modules_list.append('finance')
+                    if form.show_education.data:
+                        modules_list.append('education')
+                    
+                    # Update the modules JSON
+                    share_link.modules = json.dumps(modules_list)
+                    
                     # Update password if needed
                     if form.password_protect.data:
                         if form.one_time_password.data:
@@ -730,6 +772,25 @@ def edit_share(share_id):
                         db.session.close()
                         db.session = db.create_scoped_session()
                         
+                        # Build modules list again for fallback method
+                        modules_list = ['dashboard']  # Dashboard is always included
+                        if form.show_weight.data:
+                            modules_list.append('weight')
+                        if form.show_heart_rate.data:
+                            modules_list.append('heartrate')
+                        if form.show_activity.data:
+                            modules_list.append('activity')
+                        if form.show_sleep.data:
+                            modules_list.append('sleep')
+                        if form.show_goals.data:
+                            modules_list.append('goals')
+                        if form.show_achievements.data:
+                            modules_list.append('achievements')
+                        if form.show_finance.data:
+                            modules_list.append('finance')
+                        if form.show_education.data:
+                            modules_list.append('education')
+                        
                         # 使用直接SQL更新
                         db.session.execute(
                             """UPDATE shared_links SET 
@@ -743,7 +804,8 @@ def edit_share(share_id):
                             show_achievements = :show_achievements,
                             show_finance = :show_finance,
                             show_education = :show_education,
-                            password_hash = :password_hash
+                            password_hash = :password_hash,
+                            modules = :modules
                             WHERE id = :id""",
                             {
                                 "name": form.name.data,
@@ -757,6 +819,7 @@ def edit_share(share_id):
                                 "show_finance": form.show_finance.data,
                                 "show_education": form.show_education.data,
                                 "password_hash": share_link.password_hash,
+                                "modules": json.dumps(modules_list),
                                 "id": share_id
                             }
                         )
