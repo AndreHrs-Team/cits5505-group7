@@ -1,5 +1,6 @@
 from app import db
 from app.models.finance.account import Account
+from app.models.finance.category import Category
 from app.models.finance.transaction import Transaction
 from sqlalchemy import func
 from datetime import datetime, timedelta
@@ -111,3 +112,61 @@ class TransactionService:
         except Exception as e:
             db.session.rollback()
             return False, str(e)
+        
+    
+    @staticmethod
+    def get_category_insight(user_id, days=28):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+
+        result = db.session.query(
+            Transaction.type,
+            Category.name.label('category'),
+            func.sum(Transaction.amount).label('total'),
+            func.avg(Transaction.amount).label('average'),
+            func.count(Transaction.amount).label('count')
+        ).join(Category).filter(
+            Transaction.user_id == user_id,
+            Transaction.date.between(start_date, end_date),
+            Category.user_id.is_(None)
+        ).group_by(Transaction.type, Category.name).all()
+
+        return result
+    
+    @staticmethod
+    def get_timeline_data(user_id, days=28):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+
+        results = db.session.query(
+            func.date(Transaction.date).label('day'),
+            Transaction.type,
+            func.sum(Transaction.amount).label('total')
+        ).join(Category).filter(
+            Transaction.user_id == user_id,
+            Category.user_id.is_(None),
+            Transaction.date.between(start_date, end_date)
+        ).group_by(func.date(Transaction.date), Transaction.type).order_by(func.date(Transaction.date)).all()
+
+        # Organize data by type
+        data = {'labels': [], 'EXPENSE': [], 'INCOME': []}
+        date_map = {}
+
+        for r in results:
+            # Ensure we use proper string format
+            if isinstance(r.day, str):
+                day = r.day
+            else:
+                day = r.day.strftime('%Y-%m-%d')
+
+            if day not in date_map:
+                date_map[day] = {'EXPENSE': 0, 'INCOME': 0}
+            date_map[day][r.type] = float(r.total)  # Ensure it's serializable
+
+        for day in sorted(date_map.keys()):
+            data['labels'].append(day)
+            data['EXPENSE'].append(date_map[day]['EXPENSE'])
+            data['INCOME'].append(date_map[day]['INCOME'])
+
+        return data
+

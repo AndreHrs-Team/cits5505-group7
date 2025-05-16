@@ -76,3 +76,22 @@ class TransactionController:
             'x_label': 'Transaction Types',
             'title': 'Transaction Summary (Last 28 Days)'
         }
+    
+
+    @staticmethod
+    def handle_insight_page(current_user):
+        insight_data = TransactionService.get_category_insight(current_user.id)
+        timeline_data = TransactionService.get_timeline_data(current_user.id)
+
+        insight = {'EXPENSE': [], 'INCOME': []}
+        for row in insight_data:
+            insight[row.type].append({
+                'category': row.category,
+                'total': round(row.total, 2),
+                'average': round(row.average, 2),
+                'count': row.count
+            })
+
+        return render_template('finance/finance_insight.html.j2',
+                            insight=insight,
+                            timeline_data=timeline_data)
