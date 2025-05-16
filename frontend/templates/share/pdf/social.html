@@ -44,11 +44,18 @@
         <h2>Heart Rate Records</h2>
         {% if data.heartrate and data.heartrate|length > 0 %}
         <table>
-            <tr><th>Date</th><th>Heart Rate (BPM)</th></tr>
+            <tr>
+                <th>Date</th>
+                <th>Average BPM</th>
+                <th>Min BPM</th>
+                <th>Max BPM</th>
+            </tr>
             {% for hr in data.heartrate %}
             <tr>
                 <td>{{ hr.date }}</td>
                 <td>{{ hr.value }}</td>
+                <td>{{ hr.min }}</td>
+                <td>{{ hr.max }}</td>
             </tr>
             {% endfor %}
         </table>

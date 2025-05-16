@@ -118,19 +118,23 @@
         <thead>
             <tr>
                 <th>Date</th>
-                <th>Value (bpm)</th>
+                <th>Average (bpm)</th>
+                <th>Min (bpm)</th>
+                <th>Max (bpm)</th>
                 {% if share_link.privacy_level == 'complete' %}
-                <th>Notes</th>
+                <th>Readings</th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for hr in data.heartrate %}
             <tr>
-                <td>{{ hr.date if hr.date else hr.timestamp|string }}</td>
+                <td>{{ hr.date }}</td>
                 <td>{{ hr.value }}</td>
-                {% if share_link.privacy_level == 'complete' and hr.notes %}
-                <td>{{ hr.notes }}</td>
+                <td>{{ hr.min }}</td>
+                <td>{{ hr.max }}</td>
+                {% if share_link.privacy_level == 'complete' %}
+                <td>{{ hr.count }}</td>
                 {% endif %}
             </tr>
             {% endfor %}

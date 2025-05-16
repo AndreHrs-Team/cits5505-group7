@@ -225,14 +225,14 @@ def view_shared_content(share_token):
             Transaction.user_id == share_link.user_id,
             Transaction.date >= share_link.date_range_start,
             Transaction.date <= share_link.date_range_end
-        ).all()
+        ).order_by(Transaction.date.asc()).all()
         context['categories'] = Category.query.filter_by(user_id=share_link.user_id).all()
     if 'education' in modules:
         context['education_events'] = EducationEvent.query.filter(
             EducationEvent.user_id == share_link.user_id,
             EducationEvent.date >= share_link.date_range_start,
             EducationEvent.date <= share_link.date_range_end
-        ).all()
+        ).order_by(EducationEvent.date.asc()).all()
     template = f'share/{share_link.template_type}.html'
     return render_template(template, **context)
 
@@ -889,7 +889,7 @@ def export_pdf(token):
             Transaction.user_id == share_link.user_id,
             Transaction.date >= share_link.date_range_start,
             Transaction.date <= share_link.date_range_end
-        ).all()
+        ).order_by(Transaction.date.asc()).all()
         context['categories'] = Category.query.filter_by(user_id=share_link.user_id).all()
     
     # Add education data if needed
@@ -898,7 +898,7 @@ def export_pdf(token):
             EducationEvent.user_id == share_link.user_id,
             EducationEvent.date >= share_link.date_range_start,
             EducationEvent.date <= share_link.date_range_end
-        ).all()
+        ).order_by(EducationEvent.date.asc()).all()
     
     # Render the PDF-specific template
     html = render_template(f'share/pdf/{share_link.template_type}.html', **context)

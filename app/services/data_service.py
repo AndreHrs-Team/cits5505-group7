@@ -63,7 +63,7 @@ def get_user_data_in_range(user_id, start_date, end_date,
                 'unit': latest.unit
             })
         
-        weight_data = sorted(weight_data, key=lambda x: x['date'], reverse=True)
+        weight_data = sorted(weight_data, key=lambda x: x['date'], reverse=False)
         data['weights'] = weight_data[:7] if limit_to_week else weight_data
         
         # Calculate weight statistics
@@ -108,7 +108,8 @@ def get_user_data_in_range(user_id, start_date, end_date,
                 'max_heart_rate': max_hr
             })
         
-        heart_data = sorted(heart_data, key=lambda x: x['date'], reverse=True)
+        # Sort by date in ascending order (old to new)
+        heart_data = sorted(heart_data, key=lambda x: x['date'], reverse=False)
         data['heart_rates'] = heart_data[:7] if limit_to_week else heart_data
         
         # Calculate heart rate statistics
@@ -142,7 +143,16 @@ def get_user_data_in_range(user_id, start_date, end_date,
         
         activity_data = []
         for key, acts in grouped_activities.items():
-            total_steps = sum(a.total_steps or 0 for a in acts)
+            # Process steps data
+            total_steps = 0
+            for a in acts:
+                # Prioritize total_steps field if available
+                if a.total_steps is not None and a.total_steps > 0:
+                    total_steps = max(total_steps, a.total_steps)
+                # Otherwise add up value from activity_type='steps'
+                elif a.activity_type == 'steps' and a.value is not None:
+                    total_steps += a.value
+            
             total_distance = sum(a.total_distance or 0 for a in acts)
             calories = sum(a.calories or 0 for a in acts)
             activity_data.append({
@@ -152,17 +162,27 @@ def get_user_data_in_range(user_id, start_date, end_date,
                 'calories': calories
             })
         
-        activity_data = sorted(activity_data, key=lambda x: x['date'], reverse=True)
+        # Sort by date in ascending order (old to new)
+        activity_data = sorted(activity_data, key=lambda x: x['date'], reverse=False)
         data['activities'] = activity_data[:7] if limit_to_week else activity_data
         
         # Calculate activity statistics
         if activities:
-            total_steps = sum(a.total_steps for a in activities if a.total_steps is not None)
+            # Calculate steps considering both total_steps field and activity_type='steps' value field
+            steps_from_activities = []
+            for a in activities:
+                if a.total_steps is not None and a.total_steps > 0:
+                    steps_from_activities.append(a.total_steps)
+                elif a.activity_type == 'steps' and a.value is not None:
+                    steps_from_activities.append(a.value)
+            
+            total_steps = sum(steps_from_activities) if steps_from_activities else 0
+            avg_steps = total_steps / len(steps_from_activities) if steps_from_activities else 0
+            max_steps = max(steps_from_activities) if steps_from_activities else 0
+            
+            # Keep other calculations unchanged
             total_distance = sum(a.total_distance for a in activities if a.total_distance is not None)
             total_calories = sum(a.calories for a in activities if a.calories is not None)
-            
-            avg_steps = total_steps / len([a for a in activities if a.total_steps is not None]) if any(a.total_steps is not None for a in activities) else 0
-            max_steps = max((a.total_steps for a in activities if a.total_steps is not None), default=0)
             
             data['activity_stats'] = {
                 'total_steps': total_steps,
@@ -202,7 +222,7 @@ def get_user_data_in_range(user_id, start_date, end_date,
                 'avg_quality': avg_quality
             })
         
-        sleep_data = sorted(sleep_data, key=lambda x: x['date'], reverse=True)
+        sleep_data = sorted(sleep_data, key=lambda x: x['date'], reverse=False)
         data['sleeps'] = sleep_data[:7] if limit_to_week else sleep_data
         
         # Calculate sleep statistics
@@ -337,7 +357,7 @@ def get_user_data_in_range(user_id, start_date, end_date,
     
     if include_sleep and 'sleep_stats' in data and data['sleep_stats']:
         summary['sleep'] = data['sleep_stats']
-        # 添加avg_duration_hours字段作为更直观的别名
+        # Add avg_duration_hours field as a more intuitive alias
         summary['sleep']['avg_duration_hours'] = summary['sleep']['avg_duration']
     else:
         summary['sleep'] = {'avg_duration': 0, 'min_duration': 0, 'max_duration': 0, 'avg_duration_hours': 0,
