@@ -26,7 +26,7 @@
                         <div class="col-md-6">
                             <h5>Target: {{ goal.target_value }} {{ goal.unit }}</h5>
                             <p>
-                                <strong>Current:</strong> {{ goal.current_value }} {{ goal.unit }}<br>
+                                <strong>Current:</strong> {{ goal.current_value|format_decimal(1) }} {{ goal.unit }}<br>
                                 <strong>Timeframe:</strong> {{ goal.timeframe|capitalize }}<br>
                                 <strong>Start Date:</strong> {{ goal.start_date.strftime('%Y-%m-%d') }}<br>
                                 {% if goal.end_date %}
@@ -52,7 +52,7 @@
                                         {{ goal.calculate_progress() }}%
                                     </div>
                                 </div>
-                                <div class="mt-2">Progress: {{ goal.current_value }} / {{ goal.target_value }} {{ goal.unit }}</div>
+                                <div class="mt-2">Progress: {{ goal.current_value|format_decimal(1) }} / {{ goal.target_value }} {{ goal.unit }}</div>
                             </div>
                         </div>
                     </div>

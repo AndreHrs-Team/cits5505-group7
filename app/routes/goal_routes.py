@@ -23,12 +23,32 @@ def index():
     
     # Get progress overview data (from previous progress.index)
     latest_weight = Weight.query.filter_by(user_id=current_user.id).order_by(Weight.timestamp.desc()).first()
+    latest_activity = Activity.query.filter_by(user_id=current_user.id).order_by(Activity.timestamp.desc()).first()
+    latest_sleep = Sleep.query.filter_by(user_id=current_user.id).order_by(Sleep.timestamp.desc()).first()
+    latest_heart_rate = HeartRate.query.filter_by(user_id=current_user.id).order_by(HeartRate.timestamp.desc()).first()
     
     # Calculate step trends
     now = datetime.utcnow()
+    today_start = datetime.combine(now.date(), datetime.min.time())
+    today_end = datetime.combine(now.date(), datetime.max.time())
     this_week_start = now - timedelta(days=now.weekday())
     last_week_start = this_week_start - timedelta(days=7)
     
+    # Get today's steps
+    today_activities = Activity.query.filter(
+        Activity.user_id == current_user.id,
+        Activity.timestamp >= today_start,
+        Activity.timestamp <= today_end
+    ).all()
+    
+    today_steps = 0
+    for activity in today_activities:
+        if activity.total_steps is not None and activity.total_steps > 0:
+            today_steps += activity.total_steps
+        elif activity.activity_type == 'steps' and activity.value is not None:
+            today_steps += int(activity.value)
+    
+    # Get this week's and last week's steps
     this_week_steps = Activity.query.filter(
         Activity.user_id == current_user.id,
         Activity.timestamp >= this_week_start,
@@ -56,9 +76,14 @@ def index():
                           active_goals=active_goals, 
                           completed_goals=completed_goals,
                           latest_weight=latest_weight,
+                          latest_activity=latest_activity,
+                          latest_sleep=latest_sleep,
+                          latest_heart_rate=latest_heart_rate,
                           steps_change=steps_change,
                           sleep_change=sleep_change,
-                          heart_rate_change=heart_rate_change)
+                          heart_rate_change=heart_rate_change,
+                          this_week_total=this_week_total,
+                          today_steps=today_steps)
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required

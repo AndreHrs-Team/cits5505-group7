@@ -65,6 +65,7 @@
                         <div class="mb-3">
                             {{ form.start_date.label(class="form-label") }}
                             {{ form.start_date(class="form-control", type="date") }}
+                            <small class="form-text text-muted">Use your local date format (shown in the date picker).</small>
                             {% if form.start_date.errors %}
                                 <div class="invalid-feedback d-block">
                                     {% for error in form.start_date.errors %}
@@ -77,6 +78,7 @@
                         <div class="mb-3">
                             {{ form.end_date.label(class="form-label") }}
                             {{ form.end_date(class="form-control", type="date") }}
+                            <small class="form-text text-muted">Use your local date format (shown in the date picker).</small>
                             {% if form.end_date.errors %}
                                 <div class="invalid-feedback d-block">
                                     {% for error in form.end_date.errors %}
