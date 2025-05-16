@@ -22,7 +22,17 @@
                     <h4 class="mb-0">Daily Steps (Last 30 Days)</h4>
                 </div>
                 <div class="card-body">
+                    {% if not has_activities %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> No activity records found. Please upload your activity data to see steps information.
+                    </div>
+                    {% elif not has_step_data %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> You have activity records, but none contain step data. Try uploading step data or checking your data sources.
+                    </div>
+                    {% else %}
                     <canvas id="stepsChart" width="400" height="200"></canvas>
+                    {% endif %}
                 </div>
                 <div class="card-footer">
                     <div class="d-flex justify-content-between">
@@ -87,6 +97,7 @@
 {% endblock %}
 
 {% block scripts %}
+{% if has_step_data %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('stepsChart').getContext('2d');
@@ -96,41 +107,86 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Prepare data for the chart
     const labels = stepsData.map(data => data.date).reverse();
-    const data = stepsData.map(data => data.steps).reverse();
+    const stepValues = stepsData.map(data => data.steps).reverse();
+    
+    // Define activity level colors
+    const sedentaryColor = 'rgba(255, 99, 132, 0.7)';  // Red
+    const lowActiveColor = 'rgba(255, 206, 86, 0.7)';  // Yellow
+    const somewhatActiveColor = 'rgba(153, 102, 255, 0.7)'; // Purple
+    const activeColor = 'rgba(75, 192, 192, 0.7)';    // Teal
+    const highlyActiveColor = 'rgba(54, 162, 235, 0.7)'; // Blue
+    
+    // Organize data by activity levels
+    const sedentaryData = stepValues.map(value => value < 5000 ? value : null);
+    const lowActiveData = stepValues.map(value => value >= 5000 && value < 7500 ? value : null);
+    const somewhatActiveData = stepValues.map(value => value >= 7500 && value < 10000 ? value : null);
+    const activeData = stepValues.map(value => value >= 10000 && value < 12500 ? value : null);
+    const highlyActiveData = stepValues.map(value => value >= 12500 ? value : null);
     
     // Create chart
     const stepsChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Daily Steps',
-                data: data,
-                backgroundColor: function(context) {
-                    const value = context.dataset.data[context.dataIndex];
-                    if (value >= 12500) return 'rgba(54, 162, 235, 0.7)'; // Highly Active
-                    else if (value >= 10000) return 'rgba(75, 192, 192, 0.7)'; // Active
-                    else if (value >= 7500) return 'rgba(153, 102, 255, 0.7)'; // Somewhat Active
-                    else if (value >= 5000) return 'rgba(255, 206, 86, 0.7)'; // Low Active
-                    else return 'rgba(255, 99, 132, 0.7)'; // Sedentary
+            datasets: [
+                {
+                    label: 'Sedentary (< 5,000)',
+                    data: sedentaryData,
+                    backgroundColor: sedentaryColor,
+                    borderColor: sedentaryColor,
+                    borderWidth: 1,
+                    stack: 'Stack 0'
                 },
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
+                {
+                    label: 'Low Active (5,000-7,499)',
+                    data: lowActiveData,
+                    backgroundColor: lowActiveColor,
+                    borderColor: lowActiveColor,
+                    borderWidth: 1,
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Somewhat Active (7,500-9,999)',
+                    data: somewhatActiveData,
+                    backgroundColor: somewhatActiveColor,
+                    borderColor: somewhatActiveColor,
+                    borderWidth: 1,
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Active (10,000-12,499)',
+                    data: activeData,
+                    backgroundColor: activeColor,
+                    borderColor: activeColor,
+                    borderWidth: 1,
+                    stack: 'Stack 0'
+                },
+                {
+                    label: 'Highly Active (≥ 12,500)',
+                    data: highlyActiveData,
+                    backgroundColor: highlyActiveColor,
+                    borderColor: highlyActiveColor,
+                    borderWidth: 1,
+                    stack: 'Stack 0'
+                }
+            ]
         },
         options: {
+            responsive: true,
             scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
                 y: {
+                    stacked: true,
                     beginAtZero: true,
                     title: {
                         display: true,
                         text: 'Steps'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
                     }
                 }
             },
@@ -148,10 +204,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             return label;
                         }
                     }
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    onClick: function(e, legendItem, legend) {
+                        // Toggle dataset visibility when legend item is clicked
+                        const index = legendItem.datasetIndex;
+                        const meta = legend.chart.getDatasetMeta(index);
+                        meta.hidden = meta.hidden === null ? !legend.chart.data.datasets[index].hidden : null;
+                        legend.chart.update();
+                    }
                 }
             }
         }
     });
 });
 </script>
+{% endif %}
 {% endblock %} 
