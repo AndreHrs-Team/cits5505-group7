@@ -140,6 +140,12 @@ def from_progress():
         
         if category:
             form.category.data = category
+        
+        # Convert sleep data from minutes to hours if needed
+        if category == 'sleep' and baseline and suggested_target:
+            baseline = float(baseline) / 60
+            suggested_target = float(suggested_target) / 60
+        
         if suggested_target:
             form.target_value.data = float(suggested_target)
         
@@ -160,6 +166,9 @@ def from_progress():
             progress_baseline = float(request.form.get('baseline', 0))
         elif request.form.get('baseline'):
             progress_baseline = float(request.form.get('baseline'))
+            # Convert baseline back to minutes if it's sleep data
+            if form.category.data == 'sleep' and form.unit.data == 'hours':
+                progress_baseline = progress_baseline * 60
         
         # Create goal
         goal = GoalService.create_goal(
@@ -180,9 +189,21 @@ def from_progress():
         flash('Goal created from progress data!', 'success')
         return redirect(url_for('goals.index'))
     
+    # Prepare baseline value for display
+    display_baseline = request.args.get('baseline')
+    category = request.args.get('category')
+    
+    # Format the baseline value if it's for sleep (convert minutes to hours)
+    if display_baseline and category == 'sleep':
+        try:
+            display_baseline = float(display_baseline) / 60
+            display_baseline = round(display_baseline, 1)
+        except (ValueError, TypeError):
+            pass
+    
     return render_template('goals/create_from_progress.html', 
                            form=form, 
-                           baseline=request.args.get('baseline'))
+                           baseline=display_baseline)
 
 @bp.route('/update_progress/<int:goal_id>', methods=['POST'])
 @login_required

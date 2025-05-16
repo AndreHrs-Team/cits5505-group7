@@ -14,7 +14,7 @@
                     {% if baseline %}
                         <div class="alert alert-info mb-4">
                             <i class="fas fa-info-circle"></i> 
-                            Based on your progress data, we suggest a goal with a baseline value of <strong>{{ baseline }}</strong>.
+                            Based on your progress data, we suggest a goal with a baseline value of <strong>{{ baseline|float|round(1) }}{% if form.unit.data %} {{ form.unit.data }}{% endif %}</strong>.
                         </div>
                     {% endif %}
                     
@@ -99,7 +99,7 @@
                         
                         <div class="d-grid gap-2">
                             {{ form.submit(class="btn btn-primary") }}
-                            <a href="{{ url_for('progress.index') }}" class="btn btn-secondary">Cancel</a>
+                            <a href="{{ url_for('goals.index') }}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>
